@@ -1,9 +1,15 @@
-apply plugin: 'org.asciidoctor.convert'
+apply plugin: 'org.asciidoctor.jvm.convert'
 
-
+asciidoctorj {
+	modules {
+		pdf.use()
+	}
+}
 
 asciidoctor {
-	backends = ['html5', 'pdf']
+	outputOptions {
+		backends = ['html5', 'pdf']
+	}
 	attributes 'source-highlighter': 'coderay'
 	sources {
 		include 'index.adoc'

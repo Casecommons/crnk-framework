@@ -6,12 +6,18 @@ import io.crnk.test.mock.models.Project;
 import io.crnk.test.mock.models.Task;
 import io.crnk.test.suite.InheritanceAccessTestBase;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class InheritanceClientTest extends InheritanceAccessTestBase {
+
+	@BeforeClass
+	public static void prepare() {
+		ClientTestContainer.prepare();
+	}
 
 	public InheritanceClientTest() {
 		ClientTestContainer testContainer = new ClientTestContainer();

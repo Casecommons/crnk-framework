@@ -1,16 +1,19 @@
 apply plugin: 'war'
 
 war {
-	archiveName = "example.war"
+	archiveFileName = "example.war"
 }
 
 dependencies {
 
-	compile project(':crnk-setup:crnk-setup-rs')
-	compile project(':crnk-setup:crnk-setup-cdi')
-	compile project(':crnk-home')
-	compile project(':crnk-data:crnk-data-jpa')
+	implementation project(':crnk-setup:crnk-setup-rs')
+	implementation project(':crnk-setup:crnk-setup-cdi')
+	implementation project(':crnk-home')
+	implementation project(':crnk-data:crnk-data-jpa')
 
 	compileOnly 'javax:javaee-api:7.0'
 
 }
+
+// crnk-setup-cdi redirects resources to classesDir; declare explicit dependency so Gradle 8 is satisfied
+tasks.compileJava.dependsOn(':crnk-setup:crnk-setup-cdi:processResources')

@@ -6,9 +6,15 @@ import io.crnk.test.mock.models.nested.PostCommentId;
 import io.crnk.test.mock.models.nested.PostHeader;
 import io.crnk.test.suite.NestedRepositoryAccessTestBase;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class NestedRepositoryClientTest extends NestedRepositoryAccessTestBase {
+
+    @BeforeClass
+    public static void prepare() {
+        ClientTestContainer.prepare();
+    }
 
     public NestedRepositoryClientTest() {
         ClientTestContainer testContainer = new ClientTestContainer();

@@ -6,13 +6,10 @@ buildscript {
 		def depMgmtVersion = versions['dependency.management.plugin.version']
 
 		classpath "io.spring.gradle:dependency-management-plugin:${depMgmtVersion}"
-		classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
-		classpath 'org.asciidoctor:asciidoctorj-pdf:2.3.23'
+		classpath 'org.asciidoctor:asciidoctor-gradle-jvm:3.3.2'
 		classpath 'com.moowork.gradle:gradle-node-plugin:1.1.1'
 		classpath 'org.ajoberstar.git-publish:gradle-git-publish:3.0.1'
 		classpath 'org.ajoberstar.grgit:grgit-gradle:4.1.1'
-		classpath 'org.ysb33r.gradle:grolifant:0.17.0'
-
 		// classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5-rc1'
 		classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
 
@@ -27,7 +24,7 @@ import com.vanniktech.maven.publish.JavadocJar
 
 
 wrapper {
-	gradleVersion = '6.9.2'
+	gradleVersion = '8.13'
 }
 
 apply plugin: 'jdk-bootstrap'
@@ -74,28 +71,34 @@ gradle.beforeProject { Project project ->
 		def genGradleProject = project.name.contains('crnk-gen-gradle')
 
 		if (!docs) {
-			apply plugin: 'java'
+			apply plugin: 'java-library'
 
 			sourceCompatibility = 1.8
 			targetCompatibility = 1.8
 
 			if (!bom) {
 				dependencies {
-					testCompile group: 'junit', name: 'junit', version: '4.12'
-					testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
-					testCompile group: 'org.assertj', name: 'assertj-core', version: '2.2.0'
+					testImplementation group: 'junit', name: 'junit', version: '4.12'
+					testImplementation group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+					testImplementation group: 'org.assertj', name: 'assertj-core', version: '2.2.0'
 					// https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
-					compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
+					api group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
 					// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
-					compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+					api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
 				}
 
 				test {
 					useJUnitPlatform()
 					maxParallelForks = 1
+					maxHeapSize = '2g'
 
 					testLogging {
 						exceptionFormat = 'full'
+					}
+
+					// Gradle 8: pre-create binary output dir to avoid FileNotFoundException in report generation
+					doFirst {
+						new File(project.buildDir, 'test-results/test/binary').mkdirs()
 					}
 				}
 
@@ -132,25 +135,20 @@ gradle.beforeProject { Project project ->
 				toolVersion = "0.8.5"
 			}
 
-			rootProject.tasks.jacocoMerge.executionData tasks.withType(Test)
-			rootProject.tasks.jacocoRootReport.additionalSourceDirs files(sourceSets.main.allSource.srcDirs)
-
-			def sourceDirs = rootProject.tasks.jacocoRootReport.sourceDirectories
-			def classDirs = rootProject.tasks.jacocoRootReport.classDirectories
+			rootProject.tasks.jacocoRootReport.sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
 
 			def mainOutput = files(files(sourceSets.main.output).collect {
 				fileTree(dir: it, exclude: '**/legacy/**')
 			})
 
-			rootProject.tasks.jacocoRootReport.sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
 			rootProject.tasks.jacocoRootReport.classDirectories.from mainOutput
 
 			rootProject.coveralls.sourceDirs.addAll(sourceSets.main.allSource.srcDirs.flatten())
 
 			jacocoTestReport {
 				reports {
-					xml.enabled = true // coveralls plugin depends on xml format report
-					html.enabled = true
+					xml.required = true // coveralls plugin depends on xml format report
+					html.required = true
 				}
 			}
 		}
@@ -161,12 +159,12 @@ gradle.beforeProject { Project project ->
 
 			task sourcesJar(type: Jar) {
 				from sourceSets.main.allSource
-				classifier = 'sources'
+				archiveClassifier = 'sources'
 			}
 
 			task javadocJar(type: Jar, dependsOn: 'javadoc') {
 				from javadoc.destinationDir
-				classifier = 'javadoc'
+				archiveClassifier = 'javadoc'
 			}
 
 
@@ -245,27 +243,23 @@ def publishedProjects = subprojects.findAll {
 	it.name != 'crnk-documentation' && it.name != 'crnk-ui' && it.name != 'crnk-test' && !it.name.contains('example')
 }
 
-task jacocoMerge(type: JacocoMerge) {
-	destinationFile = new File(project.buildDir, 'jacoco/test.exec')
-	doFirst {
-		executionData = files(executionData.findAll { it.exists() })
-	}
-	for (publishedProject in publishedProjects) {
-		dependsOn publishedProject.path + ":check"
-	}
-}
-
-
 task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 	description = 'Generates an aggregate report from all subprojects'
 
-	dependsOn tasks.jacocoMerge
+	dependsOn publishedProjects.collect { it.tasks.withType(Test) }.flatten()
 
-	executionData tasks.jacocoMerge.destinationFile
+	executionData fileTree(rootProject.rootDir) {
+		include '*/build/jacoco/*.exec'
+		include '*/*/build/jacoco/*.exec'
+	}
+
+	doFirst {
+		executionData = files(executionData.findAll { it.exists() })
+	}
 
 	reports {
-		html.enabled = true // human readable
-		xml.enabled = true // required by coveralls
+		html.required = true
+		xml.required = true
 	}
 
 }

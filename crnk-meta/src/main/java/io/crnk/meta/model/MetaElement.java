@@ -92,7 +92,7 @@ public class MetaElement implements Cloneable {
 		return getClass().getSimpleName() + "[name=" + getName() + "]";
 	}
 
-	public final String getId() {
+	public String getId() {
 		if (id == null) {
 			throw new UnsupportedOperationException("id not available for " + toString());
 		}

@@ -189,6 +189,9 @@ public class RuntimeClassLoaderFactory {
 		ConfigurationContainer configurations = project.getConfigurations();
 		Configuration runtimeConfiguration = configurations.findByName(configurationName + "Runtime");
 		if (runtimeConfiguration == null) {
+			runtimeConfiguration = configurations.findByName(configurationName + "RuntimeClasspath");
+		}
+		if (runtimeConfiguration == null) {
 			runtimeConfiguration = configurations.getByName(configurationName);
 		}
 		classpath.addAll(runtimeConfiguration.getFiles());

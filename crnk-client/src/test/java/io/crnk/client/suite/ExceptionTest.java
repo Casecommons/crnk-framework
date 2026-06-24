@@ -9,9 +9,15 @@ import io.crnk.test.mock.models.Task;
 import io.crnk.test.mock.repository.ScheduleRepository;
 import io.crnk.test.suite.ExceptionAccessTestBase;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ExceptionTest extends ExceptionAccessTestBase {
+
+	@BeforeClass
+	public static void prepare() {
+		ClientTestContainer.prepare();
+	}
 
 	public ExceptionTest() {
 		ClientTestContainer testContainer = new ClientTestContainer();
