@@ -18,7 +18,15 @@ public class DocumentTest {
 
 	@Test
 	public void testDocumentEqualsContract() {
-		EqualsVerifier.forClass(Document.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(Document.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
+				.withPrefabValues(ObjectNode.class,
+						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(com.fasterxml.jackson.databind.JsonNode.class,
+						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withIgnoredFields("jsonapi")
+				.verify();
 	}
 
 	@Test

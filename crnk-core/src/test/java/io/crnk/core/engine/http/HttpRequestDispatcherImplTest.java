@@ -48,9 +48,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -159,7 +159,8 @@ public class HttpRequestDispatcherImplTest {
         when(controller.isAcceptable(any(JsonPath.class), eq("GET"))).thenCallRealMethod();
 
         Response expectedResponse = new Response(null, 200);
-        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class), any(Document.class))).thenReturn(new ImmediateResult<>(expectedResponse));
+        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenReturn(new ImmediateResult<>(expectedResponse));
+        when(controller.handle(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenCallRealMethod();
 
         ControllerRegistry controllerRegistry = container.getBoot().getControllerRegistry();
         controllerRegistry.getControllers().clear();
@@ -169,7 +170,7 @@ public class HttpRequestDispatcherImplTest {
         sut.process(requestContext);
 
         verify(controller, times(1))
-                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), any(Document.class));
+                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class));
     }
 
     @Test
@@ -187,15 +188,15 @@ public class HttpRequestDispatcherImplTest {
 
         // WHEN
         when(controller.isAcceptable(any(JsonPath.class), eq(requestType))).thenCallRealMethod();
-        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class),
-                any(Document.class))).thenReturn(new ImmediateResult<>(null));
+        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenReturn(new ImmediateResult<>(null));
+        when(controller.handle(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenCallRealMethod();
 
         Map<String, Set<String>> parameters = new HashMap<>();
         sut.dispatchRequest(path, requestType, parameters, null);
 
         // THEN
         verify(controller, times(1))
-                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), any(Document.class));
+                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class));
     }
 
     @Test
@@ -213,15 +214,15 @@ public class HttpRequestDispatcherImplTest {
 
         // WHEN
         when(controller.isAcceptable(any(JsonPath.class), eq(requestType))).thenCallRealMethod();
-        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class),
-                any(Document.class))).thenReturn(new ImmediateResult<>(null));
+        when(controller.handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenReturn(new ImmediateResult<>(null));
+        when(controller.handle(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class))).thenCallRealMethod();
 
         Map<String, Set<String>> parameters = new HashMap<>();
         sut.dispatchRequest(path, requestType, parameters, null);
 
         // THEN
         verify(controller, times(1))
-                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), any(Document.class));
+                .handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class));
     }
 
     @Ignore // FIXME reasonable action contributions

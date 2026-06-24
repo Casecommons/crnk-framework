@@ -18,9 +18,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +37,7 @@ public class PagingSpecUrlBuilderTest {
 
     @Before
     public void setUp() {
-        when(resourceRegistry.getResourceUrl(any(QueryContext.class), any(ResourceInformation.class), any())).thenReturn("tasks");
+        when(resourceRegistry.getResourceUrl(any(QueryContext.class), org.mockito.ArgumentMatchers.nullable(ResourceInformation.class), any())).thenReturn("tasks");
         when(resourceRegistry.getEntry(any(Class.class))).thenReturn(mock(RegistryEntry.class));
         when(repositoryRequestSpec.getId()).thenReturn(1);
         when(repositoryRequestSpec.getRelationshipField()).thenReturn(

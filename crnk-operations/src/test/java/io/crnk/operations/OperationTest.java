@@ -11,8 +11,17 @@ public class OperationTest {
 
 	@Test
 	public void testEquals() {
-		EqualsVerifier.forClass(Operation.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(Operation.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
+				.withPrefabValues(Resource.class, resource("a"), resource("b"))
+				.verify();
 
+	}
+
+	private static Resource resource(String id) {
+		Resource resource = new Resource();
+		resource.setId(id);
+		resource.setType("type");
+		return resource;
 	}
 
 	@Test

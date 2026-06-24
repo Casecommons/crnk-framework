@@ -54,8 +54,9 @@ public class ApprovalManagerTest {
 		Mockito.when(registryEntry.getResourceRepositoryFacade()).thenReturn(repositoryFacade);
 		Mockito.when(information.getResourceType()).thenReturn("schedule");
 		Mockito.when(information.getId(Mockito.any())).thenReturn(mockId);
+		Mockito.when(information.parseIdString(Mockito.nullable(String.class))).thenReturn(mockId);
 		Mockito.when(resourceRegistry.getEntry(Mockito.any(Class.class))).thenReturn(registryEntry);
-		Mockito.when(resourceRegistry.getEntry(Mockito.any(String.class))).thenReturn(registryEntry);
+		Mockito.when(resourceRegistry.getEntry(Mockito.nullable(String.class))).thenReturn(registryEntry);
 		ModuleRegistry moduleRegistry = Mockito.mock(ModuleRegistry.class);
 		Mockito.when(moduleRegistry.getResourceRegistry()).thenReturn(resourceRegistry);
 
@@ -63,7 +64,7 @@ public class ApprovalManagerTest {
 		originalResource = new Schedule();
 		originalResource.setId(mockId);
 		originalResource.setName("Jane");
-		Mockito.when(repositoryFacade.findOne(Mockito.any(Long.class), Mockito.any(QuerySpec.class)))
+		Mockito.when(repositoryFacade.findOne(Mockito.nullable(Long.class), Mockito.nullable(QuerySpec.class)))
 				.thenReturn(originalResource);
 
 		manager = new ApprovalManager();
@@ -99,7 +100,7 @@ public class ApprovalManagerTest {
 		processVariable.put("resourceType", "schedule");
 		processVariable.put("newValues.name", "John");
 		processVariable.put("previousValues.name", "Jane");
-		Mockito.when(runtimeService.getVariables(Mockito.anyString())).thenReturn(processVariable);
+		Mockito.when(runtimeService.getVariables(Mockito.nullable(String.class))).thenReturn(processVariable);
 
 		Execution execution = Mockito.mock(Execution.class);
 		manager.approved(execution);

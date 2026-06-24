@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,6 +72,7 @@ public class FilterTest {
 		when(collectionGetController.isAcceptable(any(JsonPath.class), eq(requestType))).thenCallRealMethod();
 		when(collectionGetController.isAcceptable(any(JsonPath.class), eq(requestType))).thenCallRealMethod();
 		when(collectionGetController.handleAsync(any(JsonPath.class), any(QueryAdapter.class), any(Document.class))).thenReturn(new ImmediateResult<>(null));
+		when(collectionGetController.handle(any(JsonPath.class), any(QueryAdapter.class), org.mockito.Mockito.nullable(Document.class))).thenCallRealMethod();
 
 		when(filter.filter(any(DocumentFilterContext.class), any(DocumentFilterChain.class))).thenCallRealMethod();
 

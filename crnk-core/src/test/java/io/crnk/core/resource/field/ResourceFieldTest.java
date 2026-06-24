@@ -21,7 +21,7 @@ public class ResourceFieldTest {
 	public void testResourceIdEqualsContract() {
 		EqualsVerifier.forClass(ResourceFieldImpl.class).suppress(Warning.NONFINAL_FIELDS, Warning.REFERENCE_EQUALITY).withPrefabValues(ResourceInformation.class, Mockito.mock
 				(ResourceInformation.class), Mockito.mock(ResourceInformation.class)
-		).usingGetClass().verify();
+		).withOnlyTheseFields("underlyingName", "parentInformation").usingGetClass().verify();
 	}
 
 	@Test

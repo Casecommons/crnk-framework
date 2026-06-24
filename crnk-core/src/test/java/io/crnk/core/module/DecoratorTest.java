@@ -22,16 +22,16 @@ public class DecoratorTest {
         Assert.assertSame(repository, decorator.getWrappedObject());
 
         decorator.create(null);
-        Mockito.verify(repository, Mockito.times(1)).create(Mockito.any(Schedule.class));
+        Mockito.verify(repository, Mockito.times(1)).create(Mockito.nullable(Schedule.class));
 
         decorator.delete(null);
-        Mockito.verify(repository, Mockito.times(1)).delete(Mockito.anyLong());
+        Mockito.verify(repository, Mockito.times(1)).delete(Mockito.nullable(Long.class));
 
         decorator.findAll(null);
-        Mockito.verify(repository, Mockito.times(1)).findAll(Mockito.any(QuerySpec.class));
+        Mockito.verify(repository, Mockito.times(1)).findAll(Mockito.nullable(QuerySpec.class));
 
         decorator.findAll(null, null);
-        Mockito.verify(repository, Mockito.times(1)).findAll(Mockito.anyListOf(Long.class), Mockito.any(QuerySpec.class));
+        Mockito.verify(repository, Mockito.times(1)).findAll(Mockito.nullable(java.util.Collection.class), Mockito.nullable(QuerySpec.class));
 
         decorator.getResourceClass();
         Mockito.verify(repository, Mockito.times(1)).getResourceClass();
@@ -41,7 +41,7 @@ public class DecoratorTest {
         Mockito.verify(repository, Mockito.times(1)).save(Mockito.eq(schedule));
 
         decorator.findOne(null, null);
-        Mockito.verify(repository, Mockito.times(1)).findOne(Mockito.anyLong(), Mockito.any(QuerySpec.class));
+        Mockito.verify(repository, Mockito.times(1)).findOne(Mockito.nullable(Long.class), Mockito.nullable(QuerySpec.class));
     }
 
     interface RegistryAwareResourceRepository extends ScheduleRepository, ResourceRegistryAware {
@@ -55,28 +55,28 @@ public class DecoratorTest {
         WrappedRelationshipRepository<Schedule, Long, Task, Long> decorator = new WrappedRelationshipRepository(repository);
 
         decorator.findManyTargets(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).findManyTargets(Mockito.anyLong(), Mockito.anyString(),
-                Mockito.any(QuerySpec.class));
+        Mockito.verify(repository, Mockito.times(1)).findManyTargets(Mockito.nullable(Long.class), Mockito.nullable(String.class),
+                Mockito.nullable(QuerySpec.class));
 
         decorator.findOneTarget(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).findOneTarget(Mockito.anyLong(), Mockito.anyString(),
-                Mockito.any(QuerySpec.class));
+        Mockito.verify(repository, Mockito.times(1)).findOneTarget(Mockito.nullable(Long.class), Mockito.nullable(String.class),
+                Mockito.nullable(QuerySpec.class));
 
         decorator.setRelation(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).setRelation(Mockito.any(Schedule.class), Mockito.anyLong(),
-                Mockito.anyString());
+        Mockito.verify(repository, Mockito.times(1)).setRelation(Mockito.nullable(Schedule.class), Mockito.nullable(Long.class),
+                Mockito.nullable(String.class));
 
         decorator.addRelations(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).addRelations(Mockito.any(Schedule.class), Mockito.anyListOf(Long.class),
-                Mockito.anyString());
+        Mockito.verify(repository, Mockito.times(1)).addRelations(Mockito.nullable(Schedule.class), Mockito.nullable(java.util.Collection.class),
+                Mockito.nullable(String.class));
 
         decorator.setRelations(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).setRelations(Mockito.any(Schedule.class), Mockito.anyListOf(Long.class),
-                Mockito.anyString());
+        Mockito.verify(repository, Mockito.times(1)).setRelations(Mockito.nullable(Schedule.class), Mockito.nullable(java.util.Collection.class),
+                Mockito.nullable(String.class));
 
         decorator.removeRelations(null, null, null);
-        Mockito.verify(repository, Mockito.times(1)).removeRelations(Mockito.any(Schedule.class), Mockito.anyListOf(Long.class),
-                Mockito.anyString());
+        Mockito.verify(repository, Mockito.times(1)).removeRelations(Mockito.nullable(Schedule.class), Mockito.nullable(java.util.Collection.class),
+                Mockito.nullable(String.class));
 
         decorator.getTargetResourceClass();
         Mockito.verify(repository, Mockito.times(1)).getTargetResourceClass();

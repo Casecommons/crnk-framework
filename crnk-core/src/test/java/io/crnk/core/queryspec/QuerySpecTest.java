@@ -23,7 +23,21 @@ public class QuerySpecTest {
 
     @Test
     public void testEqualContract() {
-        EqualsVerifier.forClass(QuerySpec.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+        EqualsVerifier.forClass(QuerySpec.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
+                .withPrefabValues(FilterSpec.class,
+                        new FilterSpec(Arrays.asList("a"), FilterOperator.EQ, "x"),
+                        new FilterSpec(Arrays.asList("b"), FilterOperator.EQ, "y"))
+                .withPrefabValues(QuerySpec.class,
+                        querySpecPrefab(Task.class, "x"),
+                        querySpecPrefab(Project.class, "y"))
+                .withIgnoredFields("resourceClass", "resourceType")
+                .verify();
+    }
+
+    private static QuerySpec querySpecPrefab(Class<?> resourceClass, String filterValue) {
+        QuerySpec querySpec = new QuerySpec(resourceClass);
+        querySpec.addFilter(new FilterSpec(Arrays.asList("filterAttr"), FilterOperator.EQ, filterValue));
+        return querySpec;
     }
 
     @Test

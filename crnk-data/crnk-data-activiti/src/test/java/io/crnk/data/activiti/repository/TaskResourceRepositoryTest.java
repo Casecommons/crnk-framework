@@ -28,6 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 
 public class TaskResourceRepositoryTest extends ActivitiTestBase {
@@ -95,7 +96,9 @@ public class TaskResourceRepositoryTest extends ActivitiTestBase {
     public void updateTask() {
         QuerySpec querySpec = new QuerySpec(TaskResource.class);
 
-        OffsetDateTime updatedDueDate = OffsetDateTime.now().plusHours(12);
+        // Activiti persists dates with millisecond precision (java.util.Date), so truncate to
+        // avoid mismatches with the microsecond precision OffsetDateTime.now() provides on Java 9+.
+        OffsetDateTime updatedDueDate = OffsetDateTime.now().plusHours(12).truncatedTo(ChronoUnit.MILLIS);
         ApproveTask resource = taskRepository.findOne(task.getId(), querySpec);
         resource.setName("updatedName");
         resource.setPriority(101);
