@@ -22,9 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -82,6 +80,6 @@ public class RepositoryAdapterUtilsTest {
 
 		LinksInformation result = RepositoryAdapterUtils.enrichLinksInformation(moduleRegistry, null, resources, requestSpec);
 
-		assertThat(result, is(nullValue()));
+		assertNull(result);
 	}
 }

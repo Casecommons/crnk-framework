@@ -1,5 +1,8 @@
 package io.crnk.example.jersey;
 
+import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,7 +12,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.crnk.example.jersey.domain.model.Project;
 import io.crnk.rs.type.JsonApiMediaType;
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
 
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.core.HttpHeaders;
@@ -25,7 +27,6 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
 
 /**
  * NOTE that you may rather want to use crnk-client for testing! This showcases regular rest testing.

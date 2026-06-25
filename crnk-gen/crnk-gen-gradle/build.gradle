@@ -31,7 +31,6 @@ dependencies {
 
     api 'com.fasterxml.jackson.core:jackson-databind'
 
-    compileOnly 'junit:junit:4.12'
 
     testImplementation gradleTestKit()
     testImplementation project(':crnk-core')

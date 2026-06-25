@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Iterator;
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -174,7 +174,7 @@ public class RelationshipsGetControllerTest extends ControllerTestBase {
             }
         }
 
-        assertTrue("Could not find ids" + ids, ids.size() == 0);
+        assertTrue(ids.size() == 0, "Could not find ids" + ids);
 
 
     }

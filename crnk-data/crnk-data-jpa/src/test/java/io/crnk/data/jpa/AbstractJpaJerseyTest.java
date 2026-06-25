@@ -1,4 +1,5 @@
 package io.crnk.data.jpa;
+import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.AfterEach;
 
@@ -24,9 +25,6 @@ import io.crnk.test.JerseyTestBase;
 import io.crnk.test.mock.TestModule;
 import okhttp3.OkHttpClient.Builder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import jakarta.persistence.Entity;
@@ -62,7 +60,6 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
         });
     }
 
-    @Before
     @BeforeEach
     public void setup() {
         client = new CrnkClient(getBaseUri().toString());
@@ -86,7 +83,6 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
     }
 
     @Override
-    @After
     @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
@@ -117,7 +113,7 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
 
         public TestApplication() {
 
-            Assert.assertNull(context);
+            Assertions.assertNull(context);
 
             context = new AnnotationConfigApplicationContext(JpaTestConfig.class);
             context.start();

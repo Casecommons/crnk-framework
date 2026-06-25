@@ -1,6 +1,6 @@
 package io.crnk.spring.metrics;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.registry.ResourceRegistry;
@@ -8,16 +8,17 @@ import io.crnk.spring.setup.boot.monitor.CrnkServerRequestObservationConvention;
 import io.crnk.test.mock.TestModule;
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
-import junitparams.JUnitParamsRunner;
-import org.junit.runner.RunWith;
-import junitparams.Parameters;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.server.observation.ServerRequestObservationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-@RunWith(JUnitParamsRunner.class)
+import java.util.stream.Stream;
+
 public class CrnkWebMvcTagsProviderTest {
 
 	private ResourceRegistry resourceRegistry;
@@ -26,7 +27,7 @@ public class CrnkWebMvcTagsProviderTest {
 
 	private CrnkServerRequestObservationConvention convention;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		boot = new CrnkBoot();
 		boot.addModule(new TestModule());
@@ -41,36 +42,21 @@ public class CrnkWebMvcTagsProviderTest {
 
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
-		// no path pattern resolved by Crnk -> falls back to the default convention, which yields URI "UNKNOWN"
 		assertEquals("UNKNOWN", getUriTag(convention.getLowCardinalityKeyValues(context)));
 	}
 
-	@SuppressWarnings("unused")
-	private Object[] handleCrnkResourceParameters() {
+	static Stream<Arguments> handleCrnkResourceParameters() {
 		String id = "124";
-
-		return new Object[] {
-				new Object[] {
-						"/tasks",
-						"/tasks"
-				},
-				new Object[] {
-						"/tasks/" + id,
-						"/tasks/{id}"
-				},
-				new Object[] {
-						"/tasks/" + id + "/name",
-						"/tasks/{id}/name"
-				},
-				new Object[] {
-						"/tasks/" + id + "/relationships/project",
-						"/tasks/{id}/relationships/project"
-				}
-		};
+		return Stream.of(
+				Arguments.of("/tasks", "/tasks"),
+				Arguments.of("/tasks/" + id, "/tasks/{id}"),
+				Arguments.of("/tasks/" + id + "/name", "/tasks/{id}/name"),
+				Arguments.of("/tasks/" + id + "/relationships/project", "/tasks/{id}/relationships/project")
+		);
 	}
 
-	@Test
-	@Parameters(method = "handleCrnkResourceParameters")
+	@ParameterizedTest
+	@MethodSource("handleCrnkResourceParameters")
 	public void handleCrnkResource(final String requestUrl, final String expected) {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setRequestURI(requestUrl);

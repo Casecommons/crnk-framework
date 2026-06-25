@@ -1,4 +1,8 @@
 package io.crnk.data.jpa.meta;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+
+import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.BeforeEach;
 
@@ -7,9 +11,6 @@ import io.crnk.meta.MetaLookupImpl;
 import io.crnk.meta.model.MetaArrayType;
 import io.crnk.meta.model.MetaDataObject;
 import io.crnk.meta.model.MetaType;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Collections;
 
@@ -17,7 +18,6 @@ public class MetaLookupTest {
 
 	private JpaMetaProvider metaProvider;
 
-	@Before
 	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
@@ -29,13 +29,13 @@ public class MetaLookupTest {
 	public void testObjectArrayMeta() {
 		MetaArrayType meta = metaProvider.discoverMeta(TestEntity[].class);
 		MetaType elementType = meta.getElementType();
-		Assert.assertTrue(elementType instanceof MetaDataObject);
+		Assertions.assertTrue(elementType instanceof MetaDataObject);
 	}
 
 	@Test
 	public void testPrimitiveArrayMeta() {
 		MetaArrayType type = (MetaArrayType) metaProvider.discoverMeta(byte[].class).asType();
-		Assert.assertEquals(byte[].class, type.getImplementationClass());
+		Assertions.assertEquals(byte[].class, type.getImplementationClass());
 	}
 
 }

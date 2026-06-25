@@ -91,7 +91,6 @@ gradle.beforeProject { Project project ->
 
 			if (!bom) {
 				dependencies {
-					testImplementation group: 'junit', name: 'junit', version: '4.12'
 					testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
 					testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 					testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

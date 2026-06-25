@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 package io.crnk.servlet;
+import org.junit.jupiter.api.Assertions;
 
 import io.crnk.core.boot.CrnkProperties;
 import io.crnk.core.engine.http.HttpHeaders;

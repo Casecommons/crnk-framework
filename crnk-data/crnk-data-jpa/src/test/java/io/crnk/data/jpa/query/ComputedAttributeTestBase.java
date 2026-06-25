@@ -1,16 +1,17 @@
 package io.crnk.data.jpa.query;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+
+import org.junit.jupiter.api.Test;
 
 import io.crnk.core.queryspec.Direction;
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.data.jpa.model.TestEntity;
-import org.junit.Assert;
-import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 
 @Transactional
 public abstract class ComputedAttributeTestBase extends AbstractJpaTest {
@@ -35,7 +36,7 @@ public abstract class ComputedAttributeTestBase extends AbstractJpaTest {
 		query.addSortBy(Arrays.asList(TestEntity.ATTR_stringValue), Direction.ASC);
 
 		List<Tuple> resultList = query.buildExecutor().getResultTuples();
-		Assert.assertEquals(5, resultList.size());
+		Assertions.assertEquals(5, resultList.size());
 		for (int i = 0; i < resultList.size(); i++) {
 			Tuple tuple = resultList.get(i);
 			assertEquals("TEST" + i, tuple.get(ATTR_VIRTUAL_VALUE, String.class));

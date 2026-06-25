@@ -1,4 +1,9 @@
 package io.crnk.data.jpa.query.criteria;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.data.jpa.internal.query.backend.criteria.JpaCriteriaQueryExecutorImpl;
@@ -8,9 +13,6 @@ import io.crnk.data.jpa.query.BasicQueryTestBase;
 import io.crnk.data.jpa.query.JpaQuery;
 import io.crnk.data.jpa.query.JpaQueryExecutor;
 import io.crnk.data.jpa.query.JpaQueryFactory;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -18,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
 
 public class BasicCriteriaTest extends BasicQueryTestBase {
 
@@ -55,11 +56,11 @@ public class BasicCriteriaTest extends BasicQueryTestBase {
         em.flush();
 
         JpaQueryExecutor<TestEntity> executor = builder.buildExecutor();
-        Assert.assertEquals(1, executor.getTotalRowCount());
+        Assertions.assertEquals(1, executor.getTotalRowCount());
         List<TestEntity> relatedEntity = executor.getResultList();
         assertEquals(1L, relatedEntity.size());
         TestEntity testEntity = relatedEntity.get(0);
-        Assert.assertEquals("test1", testEntity.getStringValue());
+        Assertions.assertEquals("test1", testEntity.getStringValue());
     }
 
 
@@ -70,7 +71,7 @@ public class BasicCriteriaTest extends BasicQueryTestBase {
         executor.setCached(true);
         TypedQuery<TestEntity> typedQuery = executor.getTypedQuery();
         Map<String, Object> hints = typedQuery.getHints();
-        Assert.assertTrue(hints.containsKey("org.hibernate.cacheable"));
+        Assertions.assertTrue(hints.containsKey("org.hibernate.cacheable"));
     }
 
     @Test
