@@ -25,7 +25,6 @@ dependencies {
 	implementation project(':crnk-home')
 	implementation project(':crnk-data:crnk-data-jpa')
 	implementation 'com.h2database:h2:1.4.200'
-	implementation 'org.hibernate:hibernate-entitymanager:5.5.3.Final'
 }
 
 // crnk-setup-cdi redirects resources to classesDir; declare explicit dependency so Gradle 8 is satisfied

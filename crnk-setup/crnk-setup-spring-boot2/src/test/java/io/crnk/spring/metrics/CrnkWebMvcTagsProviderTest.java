@@ -1,18 +1,19 @@
 package io.crnk.spring.metrics;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.registry.ResourceRegistry;
-import io.crnk.spring.setup.boot.monitor.CrnkWebMvcTagsProvider;
+import io.crnk.spring.setup.boot.monitor.CrnkServerRequestObservationConvention;
 import io.crnk.test.mock.TestModule;
-import io.micrometer.core.instrument.Tag;
+import io.micrometer.common.KeyValue;
+import io.micrometer.common.KeyValues;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.http.server.observation.ServerRequestObservationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -23,14 +24,14 @@ public class CrnkWebMvcTagsProviderTest {
 
 	private CrnkBoot boot;
 
-	private CrnkWebMvcTagsProvider compositeTagsProvider;
+	private CrnkServerRequestObservationConvention convention;
 
 	@Before
 	public void setup() {
 		boot = new CrnkBoot();
 		boot.addModule(new TestModule());
 		boot.boot();
-		compositeTagsProvider = new CrnkWebMvcTagsProvider(boot);
+		convention = new CrnkServerRequestObservationConvention(boot);
 	}
 
 	@Test
@@ -38,8 +39,10 @@ public class CrnkWebMvcTagsProviderTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setAttribute("org.springframework.web.servlet.HandlerMapping.bestMatchingPattern", "/any");
 
-		Iterable<Tag> tags = compositeTagsProvider.getTags(request, new MockHttpServletResponse(), mock(Object.class), mock(Throwable.class));
-		assertEquals("/any", getUriTag(tags));
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
+		// no path pattern resolved by Crnk -> falls back to the default convention, which yields URI "UNKNOWN"
+		assertEquals("UNKNOWN", getUriTag(convention.getLowCardinalityKeyValues(context)));
 	}
 
 	@SuppressWarnings("unused")
@@ -72,15 +75,16 @@ public class CrnkWebMvcTagsProviderTest {
 		MockHttpServletRequest request = new MockHttpServletRequest();
 		request.setRequestURI(requestUrl);
 
-		Iterable<Tag> tags = compositeTagsProvider.getTags(request, new MockHttpServletResponse(), mock(Object.class), mock(Throwable.class));
+		MockHttpServletResponse response = new MockHttpServletResponse();
+		ServerRequestObservationContext context = new ServerRequestObservationContext(request, response);
 
-		assertEquals(expected, getUriTag(tags));
+		assertEquals(expected, getUriTag(convention.getLowCardinalityKeyValues(context)));
 	}
 
-	private String getUriTag(Iterable<Tag> tags) {
-		for (Tag tag : tags) {
-			if (tag.getKey().equals("uri")) {
-				return tag.getValue();
+	private String getUriTag(KeyValues keyValues) {
+		for (KeyValue keyValue : keyValues) {
+			if (keyValue.getKey().equals("uri")) {
+				return keyValue.getValue();
 			}
 		}
 		throw new IllegalStateException();

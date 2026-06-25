@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 /**
@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Import;
  * <p>
  * Disable with the property <code>crnk.format.plain.enabled = false</code>
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "crnk.format.plain", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnClass(PlainJsonFormatModule.class)
 @ConditionalOnMissingBean(PlainJsonFormatModule.class)

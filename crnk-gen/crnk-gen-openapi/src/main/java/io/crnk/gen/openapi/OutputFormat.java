@@ -1,7 +1,7 @@
 package io.crnk.gen.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.util.Json;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.Yaml;
 import io.swagger.v3.oas.models.OpenAPI;
 

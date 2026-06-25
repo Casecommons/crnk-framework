@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.Serializable;
-import javax.security.auth.message.config.AuthConfigFactory;
+import jakarta.security.auth.message.config.AuthConfigFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.crnk.client.CrnkClient;
@@ -307,7 +307,11 @@ public class BasicSpringBoot2Test {
 			ErrorData errorData = document.getErrors().get(0);
 			Assert.assertEquals("404", errorData.getStatus());
 			Assert.assertEquals("Not Found", errorData.getTitle());
-			Assert.assertEquals("No message available", errorData.getDetail());
+			// Spring Boot 4 reports a descriptive message for an unmatched request (e.g. "No static
+			// resource doesNotExist.") where earlier versions used the generic "No message available"
+			// placeholder. Assert only that crnk surfaces a non-empty detail in the JSON:API error.
+			Assert.assertNotNull(errorData.getDetail());
+			Assert.assertFalse(errorData.getDetail().isEmpty());
 		}
 	}
 }

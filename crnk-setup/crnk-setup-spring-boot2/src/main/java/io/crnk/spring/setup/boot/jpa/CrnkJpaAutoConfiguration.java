@@ -9,40 +9,36 @@ import io.crnk.spring.jpa.SpringTransactionRunner;
 import io.crnk.spring.setup.boot.core.CrnkCoreAutoConfiguration;
 import io.crnk.spring.setup.boot.core.CrnkCoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Import;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.PersistenceContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
 /**
  * @link EnableAutoConfiguration Auto-configuration} for Crnk' JPA module.
  * <p>
- * Activates when there is a bean of type {@link javax.persistence.EntityManagerFactory} and
- * {@link javax.persistence.EntityManager} on the classpath and there is no other existing
+ * Activates when there is a bean of type {@link jakarta.persistence.EntityManagerFactory} and
+ * {@link jakarta.persistence.EntityManager} on the classpath and there is no other existing
  * {@link JpaModule} configured.
  * <p>
  * Disable with the property <code>crnk.jpa.enabled = false</code>. By default all entities are exposed.
  * <p>
  * This configuration class will activate <em>after</em> the Hibernate auto-configuration.
  */
-@Configuration
+@AutoConfiguration(after = HibernateJpaAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "crnk.jpa", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnClass(JpaModule.class)
 @ConditionalOnMissingBean(JpaModule.class)
 @EnableConfigurationProperties({CrnkJpaProperties.class, CrnkCoreProperties.class})
-@AutoConfigureAfter(HibernateJpaAutoConfiguration.class)
-@AutoConfigureBefore
 @Import({CrnkCoreAutoConfiguration.class})
 public class CrnkJpaAutoConfiguration {
 
@@ -75,7 +71,7 @@ public class CrnkJpaAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public JpaModule jpaModule(JpaModuleConfig config) {
+    public JpaModule jpaModule(JpaModuleConfig config, SpringTransactionRunner transactionRunner) {
         if (configurers != null) {
             for (JpaModuleConfigurer configurer : configurers) {
                 configurer.configure(config);
@@ -98,6 +94,10 @@ public class CrnkJpaAutoConfiguration {
                     throw new IllegalStateException("unknown query factory");
             }
         }
-        return JpaModule.createServerModule(config, em, transactionRunner());
+        // Note: inject the managed SpringTransactionRunner bean (whose PlatformTransactionManager has been
+        // autowired) rather than calling transactionRunner(). Since this class is now an @AutoConfiguration
+        // (proxyBeanMethods=false), a direct method call would create an unmanaged instance with a null
+        // transaction manager, producing "No PlatformTransactionManager set" at request time.
+        return JpaModule.createServerModule(config, em, transactionRunner);
     }
 }

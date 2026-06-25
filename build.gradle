@@ -67,9 +67,7 @@ gradle.beforeProject { Project project ->
 		// Modules whose test stacks cannot run on Java 21 and are not worth modernizing.
 		// Their main sources still compile to Java 21; only test execution is disabled.
 		def java21IncompatibleTestModules = [
-			// Spring 5.2 (Boot 2.3) bundles ASM 7, which cannot parse Java 21 (class major 65) bytecode during component scanning.
-			'crnk-setup-spring-boot2',
-			// Spring Boot 2.0.x (Spring 5.0/ASM 6) + abandoned com.jayway.restassured 2.9.0 (Groovy 2.x) - incompatible with Java 21.
+			// Spring Boot examples still use abandoned com.jayway.restassured 2.9.0 (Groovy 2.x) - incompatible with Java 21/Jakarta.
 			'spring-boot-example', 'spring-boot-minimal-example', 'spring-boot-microservice-example',
 			// Gradle TestKit spins up an embedded Gradle whose Groovy runtime fails to initialize on Java 21.
 			'crnk-gen-gradle'
@@ -92,10 +90,10 @@ gradle.beforeProject { Project project ->
 					testImplementation group: 'junit', name: 'junit', version: '4.12'
 					testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
 					testImplementation group: 'org.assertj', name: 'assertj-core', version: '2.2.0'
-					// https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
-					api group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
-					// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
-					api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+					// Jakarta EE: common annotations (@PostConstruct, @Generated, @Priority, ...)
+					api group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.1'
+					// Jakarta XML Binding (JAXB) API
+					api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
 				}
 
 				test {
@@ -139,19 +137,33 @@ gradle.beforeProject { Project project ->
 				apply plugin: 'io.spring.dependency-management'
 				dependencyManagement {
 					imports {
-						mavenBom 'io.projectreactor:reactor-bom:Bismuth-RELEASE'
-						mavenBom 'org.glassfish.jersey:jersey-bom:2.26'
+						// Align with the Reactor BOM managed by Spring Boot 4 (the old Bismuth-RELEASE / Reactor 3.1
+						// predates reactor.core.CorePublisher, which Spring Boot 4's WebMVC adapter requires).
+						mavenBom 'io.projectreactor:reactor-bom:2025.0.0'
+						mavenBom 'org.glassfish.jersey:jersey-bom:3.1.9'
 					}
 					dependencies {
-						dependency 'com.fasterxml.jackson.core:jackson-databind:2.9.10'
-						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.9.10'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.10'
-						dependency 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.10'
-						dependency 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.10'
-						dependency 'com.fasterxml.jackson.core:jackson-core:2.9.10'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.10'
+						dependency 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.20'
+						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0'
+						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:2.20.0'
+						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-base:2.20.0'
+						dependency 'com.fasterxml.jackson.core:jackson-core:2.20.0'
+						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
 
 						dependency 'org.reflections:reflections:0.9.11'
+
+						// The Spring Boot 4 BOM pulls JUnit 6.0 / JUnit Platform 6.0, whose engine
+						// is incompatible with the JUnit Platform 1.x launcher bundled by Gradle 8.13
+						// (test workers fail to start). Pin back to the JUnit 5.11 / Platform 1.11 line.
+						dependency 'org.junit.jupiter:junit-jupiter:5.11.4'
+						dependency 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+						dependency 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
+						dependency 'org.junit.jupiter:junit-jupiter-params:5.11.4'
+						dependency 'org.junit.vintage:junit-vintage-engine:5.11.4'
+						dependency 'org.junit.platform:junit-platform-commons:1.11.4'
+						dependency 'org.junit.platform:junit-platform-engine:1.11.4'
+						dependency 'org.junit.platform:junit-platform-launcher:1.11.4'
 					}
 				}
 			}

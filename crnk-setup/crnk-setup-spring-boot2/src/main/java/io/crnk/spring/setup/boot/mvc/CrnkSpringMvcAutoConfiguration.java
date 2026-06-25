@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
  * <p>
  * Disable with the property <code>crnk.spring.mvc.enabled = false</code>
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = "crnk.spring.mvc", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnClass(RequestMappingHandlerMapping.class)

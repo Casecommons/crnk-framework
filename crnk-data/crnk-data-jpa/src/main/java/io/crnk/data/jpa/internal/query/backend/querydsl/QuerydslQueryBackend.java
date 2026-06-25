@@ -3,10 +3,8 @@ package io.crnk.data.jpa.internal.query.backend.querydsl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.annotation.Nullable;
-import javax.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.JoinType;
 
-import com.google.common.collect.ImmutableList;
 import com.querydsl.core.support.FetchableSubQueryBase;
 import com.querydsl.core.types.CollectionExpression;
 import com.querydsl.core.types.EntityPath;
@@ -330,7 +328,7 @@ public class QuerydslQueryBackend<T>
 			// only two elements for each operation supported, needs querydsl fix?
 			Predicate result = predicates.get(0);
 			for (int i = 1; i < predicates.size(); i++) {
-				result = new BooleanPredicateOperation(Ops.AND, ImmutableList.of(result, predicates.get(i)));
+				result = new BooleanPredicateOperation(Ops.AND, List.of(result, predicates.get(i)));
 			}
 			return result;
 		}
@@ -350,7 +348,7 @@ public class QuerydslQueryBackend<T>
 			// only two elements for each operation supported, needs querydsl fix?
 			Predicate result = predicates.get(0);
 			for (int i = 1; i < predicates.size(); i++) {
-				result = new BooleanPredicateOperation(Ops.OR, ImmutableList.of(result, predicates.get(i)));
+				result = new BooleanPredicateOperation(Ops.OR, List.of(result, predicates.get(i)));
 			}
 			return result;
 		}
@@ -443,10 +441,9 @@ public class QuerydslQueryBackend<T>
 
 		private static final long serialVersionUID = -5371430939203772072L;
 
-		@Nullable
 		private transient volatile Predicate not;
 
-		protected BooleanPredicateOperation(Ops ops, ImmutableList<Expression<?>> list) {
+		protected BooleanPredicateOperation(Ops ops, List<Expression<?>> list) {
 			super(Boolean.class, ops, list);
 			if (list.isEmpty()) {
 				throw new IllegalArgumentException("list cannot be empty");

@@ -8,7 +8,7 @@ java {
 
 dependencies {
 	api project(':crnk-core')
-	compileOnly(group: 'javax', name: 'javaee-api', version: '7.0')
+	compileOnly(group: 'jakarta.platform', name: 'jakarta.jakartaee-api', version: '10.0.0')
 
 	testImplementation 'com.h2database:h2:1.4.195'
 

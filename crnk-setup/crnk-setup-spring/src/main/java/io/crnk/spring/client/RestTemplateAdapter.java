@@ -6,7 +6,6 @@ import io.crnk.client.http.HttpAdapterRequest;
 import io.crnk.core.engine.http.HttpMethod;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -79,10 +78,6 @@ public class RestTemplateAdapter implements HttpAdapter {
                     HttpComponentsClientHttpRequestFactory apacheRequestFactory =
                             (HttpComponentsClientHttpRequestFactory) impl.getRequestFactory();
                     apacheRequestFactory.setReadTimeout(networkTimeout.intValue());
-                } else if (requestFactory instanceof OkHttp3ClientHttpRequestFactory) {
-                    OkHttp3ClientHttpRequestFactory okhttpRequestFactory =
-                            (OkHttp3ClientHttpRequestFactory) impl.getRequestFactory();
-                    okhttpRequestFactory.setReadTimeout(networkTimeout.intValue());
                 } else {
                     throw new IllegalStateException("unknown type " + requestFactory);
                 }

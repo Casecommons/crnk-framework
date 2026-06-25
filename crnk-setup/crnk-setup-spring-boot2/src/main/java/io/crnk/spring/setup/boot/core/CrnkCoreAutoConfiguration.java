@@ -26,7 +26,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import java.util.List;
  * Current crnk configuration with JSON API compliance, QuerySpec and module support.
  * Note that there is no support for QueryParams is this version due to the lack of JSON API compatibility.
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "crnk", name = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnMissingBean(CrnkBoot.class)
 @EnableConfigurationProperties(CrnkCoreProperties.class)

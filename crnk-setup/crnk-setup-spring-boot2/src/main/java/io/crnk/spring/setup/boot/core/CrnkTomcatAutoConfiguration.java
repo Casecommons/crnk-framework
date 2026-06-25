@@ -7,11 +7,11 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.web.embedded.tomcat.ConfigurableTomcatWebServerFactory;
-import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.tomcat.ConfigurableTomcatWebServerFactory;
+import org.springframework.boot.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.core.Ordered;
 
 /**
@@ -19,7 +19,7 @@ import org.springframework.core.Ordered;
  * /44005213#44005213.
  * Relaxes tomcat connector for [ and ] till browser vendor properly implement spec (if they ever do so).
  */
-@Configuration
+@AutoConfiguration
 @ConditionalOnClass({Connector.class, AbstractHttp11Protocol.class})
 public class CrnkTomcatAutoConfiguration {
 

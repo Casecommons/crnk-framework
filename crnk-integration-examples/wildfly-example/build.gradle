@@ -11,7 +11,7 @@ dependencies {
 	implementation project(':crnk-home')
 	implementation project(':crnk-data:crnk-data-jpa')
 
-	compileOnly 'javax:javaee-api:7.0'
+	compileOnly 'jakarta.platform:jakarta.jakartaee-api:10.0.0'
 
 }
 

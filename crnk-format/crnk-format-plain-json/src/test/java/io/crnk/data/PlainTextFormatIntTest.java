@@ -3,8 +3,8 @@ package io.crnk.data;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 import io.crnk.client.CrnkClient;
 import io.crnk.core.engine.http.HttpHeaders;
@@ -37,6 +37,17 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 
 	}
 
+	/**
+	 * The Jersey Jetty test container reports the base URI with a trailing slash (e.g. {@code .../}).
+	 * Concatenating {@code "/tasks"} therefore produced a {@code //tasks} URL whose empty path segment is
+	 * rejected by Jetty 12 with "400 Ambiguous URI path separator" (Jetty 9 tolerated it). Strip the
+	 * trailing slash so well-formed URLs are produced.
+	 */
+	private String baseUrl() {
+		String uri = getBaseUri().toString();
+		return uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
+	}
+
 	@Before
 	public void setup() {
 		ProjectRepository projectRepository = new ProjectRepository();
@@ -60,7 +71,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 
 	@Test
 	public void checkGet() {
-		Response getResponse = RestAssured.get(getBaseUri() + "/tasks/12?include=project");
+		Response getResponse = RestAssured.get(baseUrl() + "/tasks/12?include=project");
 		Assert.assertEquals(200, getResponse.getStatusCode());
 		getResponse.then().assertThat().body("data.id", Matchers.equalTo("12"));
 		getResponse.then().assertThat().body("data.type", Matchers.equalTo("tasks"));
@@ -73,7 +84,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 
 	@Test
 	public void checkJsonApiAccess() {
-		CrnkClient client = new CrnkClient(getBaseUri().toString());
+		CrnkClient client = new CrnkClient(baseUrl());
 		ResourceRepository<Task, Serializable> repository = client.getRepositoryForType(Task.class);
 		Task createdTask = repository.findOne(12L, new QuerySpec(Task.class));
 		Assert.assertEquals("someTask", createdTask.getName());
@@ -94,11 +105,11 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 				contentType(HttpHeaders.JSON_CONTENT_TYPE).
 				body(documentMap).
 				when().
-				post(getBaseUri() + "/tasks");
+				post(baseUrl() + "/tasks");
 		postResponse.then().statusCode(201);
 
 
-		CrnkClient client = new CrnkClient(getBaseUri().toString());
+		CrnkClient client = new CrnkClient(baseUrl());
 		ResourceRepository<Task, Serializable> repository = client.getRepositoryForType(Task.class);
 		Task createdTask = repository.findOne(13L, new QuerySpec(Task.class));
 		Assert.assertEquals("otherTask", createdTask.getName());

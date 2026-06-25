@@ -3,6 +3,7 @@ package io.crnk.spring.client;
 import io.crnk.client.http.HttpAdapterResponse;
 import io.crnk.core.engine.internal.utils.StringUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -21,8 +22,8 @@ public class RestTemplateResponse implements HttpAdapterResponse {
 
     public RestTemplateResponse(ResponseEntity<String> response) {
         this.body = response.getBody();
-        this.status = response.getStatusCodeValue();
-        this.message = response.getStatusCode().getReasonPhrase();
+        this.status = response.getStatusCode().value();
+        this.message = response.getStatusCode() instanceof HttpStatus hs ? hs.getReasonPhrase() : "";
         this.headers = response.getHeaders();
     }
 
@@ -61,7 +62,7 @@ public class RestTemplateResponse implements HttpAdapterResponse {
 
     @Override
     public Set<String> getHeaderNames() {
-        return headers.keySet();
+        return headers.headerNames();
     }
 
 }

@@ -26,7 +26,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+// The shared setup() stubs more collaborators than this single test exercises; under the strict
+// MockitoJUnitRunner (default since Mockito 2) that triggers UnnecessaryStubbingException. Use the
+// lenient (Silent) runner to preserve the original intent of the shared fixture.
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class RepositoryAdapterUtilsTest {
 
 	private static final String TEST_PATH = "http://test.path/";

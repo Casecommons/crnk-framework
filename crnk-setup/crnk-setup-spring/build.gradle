@@ -3,7 +3,7 @@ apply plugin: 'java'
 apply plugin: 'io.spring.dependency-management'
 dependencyManagement {
 	imports {
-		mavenBom 'org.springframework.boot:spring-boot-dependencies:1.5.8.RELEASE'
+		mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.0'
 	}
 }
 
@@ -16,8 +16,7 @@ dependencies {
 	compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
 	compileOnly 'org.springframework.boot:spring-boot-starter-actuator'
 	compileOnly 'org.springframework.security:spring-security-core'
-	compileOnly 'org.springframework.cloud:spring-cloud-starter-sleuth:1.3.0.RELEASE'
-	compileOnly 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final'
+	compileOnly 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 
 	compileOnly 'org.springframework:spring-orm'
 
@@ -26,18 +25,21 @@ dependencies {
 	testImplementation project(':crnk-ui')
 	testImplementation project(':crnk-client')
 	testImplementation project(':crnk-test')
-	testImplementation group: 'javax', name: 'javaee-api', version: '7.0'
-	testImplementation 'javax.el:javax.el-api:2.2.4'
-	testImplementation 'org.glassfish.web:javax.el:2.2.6'
+	// The jakarta.jakartaee-api:10.0.0 umbrella bundles the Jakarta Persistence 3.1 classes, which shadow
+	// the standalone 3.2.0 API that Hibernate 7 / Spring Boot 4 require (e.g. PersistenceUnitInfo
+	// .getScopeAnnotationName()). Rely on the focused standalone APIs instead of the umbrella jar.
+	testImplementation 'jakarta.el:jakarta.el-api:5.0.1'
+	testImplementation 'org.glassfish:jakarta.el:4.0.2'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	testImplementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-actuator'
-	testImplementation 'org.springframework.cloud:spring-cloud-starter-sleuth:1.3.0.RELEASE'
 
-	testImplementation 'org.hibernate:hibernate-core'
-	testImplementation 'org.hibernate:hibernate-entitymanager'
+	// Use the Hibernate 7 managed by the Spring Boot 4 BOM: Boot 4's HibernateJpaConfiguration references
+	// PhysicalNamingStrategySnakeCaseImpl which only exists in Hibernate 7. This test does not exercise the
+	// crnk QueryDSL backend (which still requires Hibernate 6.6.4 in crnk-data-jpa), only Spring's JPA setup.
+	testImplementation 'org.hibernate.orm:hibernate-core'
 	testImplementation 'com.h2database:h2'
 
 	testImplementation 'org.springframework.boot:spring-boot-configuration-processor'

@@ -21,10 +21,19 @@ import org.junit.Before;
 
 class OpenAPIGeneratorTestBase {
   @Before
-  public void resetYamlSingleton() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-     Field instance = Yaml.class.getDeclaredField("mapper");
-     instance.setAccessible(true);
-     instance.set(null, null);
+  public void resetYamlSingleton() throws SecurityException, IllegalArgumentException, IllegalAccessException {
+     // swagger-core 2.2.x declares the cached "mapper" field on the ObjectMapperFactory superclass
+     // rather than on Yaml itself; walk the hierarchy so the singleton can still be reset between tests.
+     for (Class<?> type = Yaml.class; type != null; type = type.getSuperclass()) {
+        try {
+           Field instance = type.getDeclaredField("mapper");
+           instance.setAccessible(true);
+           instance.set(null, null);
+           return;
+        } catch (NoSuchFieldException e) {
+           // try superclass
+        }
+     }
   }
 
   static void assertJsonAPICompliantPath(String path, PathItem pathItem) {
