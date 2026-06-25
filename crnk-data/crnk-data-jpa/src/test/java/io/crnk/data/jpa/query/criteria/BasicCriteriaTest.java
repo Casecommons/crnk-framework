@@ -28,12 +28,6 @@ public class BasicCriteriaTest extends BasicQueryTestBase {
     }
 
     @Test
-    @Ignore
-    public void testEqualsInCollectionFilter() {
-        // TODO invalid SQL generated, maybe due to use of list?
-    }
-
-    @Test
     public void testAutoDistinctOnManyRelation() {
         JpaQuery<TestEntity> builder = queryFactory.query(TestEntity.class);
 

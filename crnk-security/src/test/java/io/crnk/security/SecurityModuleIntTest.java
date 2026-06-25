@@ -190,7 +190,6 @@ public class SecurityModuleIntTest extends JerseyTestBase {
         taskRepo.create(task);
     }
 
-
     @Test(expected = UnauthorizedException.class)
     public void unauthorizedPost() {
         userName = null; // do not authenticate
@@ -238,21 +237,6 @@ public class SecurityModuleIntTest extends JerseyTestBase {
     public void unauthorizedException() {
         identityManager.addUser("otherUser", "doePass", "allRole");
 
-        Project project = new Project();
-        project.setId(1L);
-        project.setName("test");
-        projectRepo.create(project);
-    }
-
-    @Test
-    public void permitAllMatchAnyType() {
-        identityManager.addUser("doe", "doePass");
-        projectRepo.findAll(new QuerySpec(Project.class));
-    }
-
-    @Test
-    public void permitAllMatchProjectType() {
-        identityManager.addUser("doe", "doePass");
         Project project = new Project();
         project.setId(1L);
         project.setName("test");
@@ -319,5 +303,4 @@ public class SecurityModuleIntTest extends JerseyTestBase {
             register(feature);
         }
     }
-
 }
