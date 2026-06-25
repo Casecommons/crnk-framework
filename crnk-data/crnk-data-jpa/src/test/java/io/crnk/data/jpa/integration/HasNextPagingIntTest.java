@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.integration;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.resource.meta.JsonLinksInformation;
 import io.crnk.core.resource.meta.JsonMetaInformation;
 import io.crnk.core.queryspec.QuerySpec;
@@ -24,6 +26,7 @@ public class HasNextPagingIntTest extends AbstractJpaJerseyTest {
 
 	@Override
 	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		testRepo = client.getRepositoryForType(TestEntity.class);

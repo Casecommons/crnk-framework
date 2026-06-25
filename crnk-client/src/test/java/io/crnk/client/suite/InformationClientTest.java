@@ -1,11 +1,11 @@
 package io.crnk.client.suite;
 
 import io.crnk.test.suite.InformationAccessTestBase;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class InformationClientTest extends InformationAccessTestBase {
 
-	@BeforeClass
+	@BeforeAll
 	public static void prepare() {
 		ClientTestContainer.prepare();
 	}

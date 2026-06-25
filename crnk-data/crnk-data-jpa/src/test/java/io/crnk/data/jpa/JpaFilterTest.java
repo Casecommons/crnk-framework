@@ -1,5 +1,7 @@
 package io.crnk.data.jpa;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.repository.ResourceRepository;
 import io.crnk.data.jpa.model.TestEntity;
@@ -22,6 +24,7 @@ public class JpaFilterTest extends AbstractJpaJerseyTest {
 
 	@Override
 	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		testRepo = client.getRepositoryForType(TestEntity.class);

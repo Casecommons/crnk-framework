@@ -13,18 +13,18 @@ import io.crnk.core.resource.links.PagedLinksInformation;
 import io.crnk.core.resource.list.DefaultResourceList;
 import io.crnk.core.resource.list.ResourceList;
 import io.crnk.core.resource.meta.DefaultPagedMetaInformation;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -198,9 +198,9 @@ public class OffsetLimitPagingBehaviorTest {
 		PagedLinksInformation pagedLinksInformation = new DefaultPagedLinksInformation();
 		pagingBehavior.build(pagedLinksInformation, resourceList, querySpecAdapter, urlBuilder);
 
-		assertThat(pagedLinksInformation.getFirst().getHref(), equalTo("http://some.org"));
-		assertThat(pagedLinksInformation.getNext().getHref(), equalTo("http://some.org"));
+		assertEquals("http://some.org", pagedLinksInformation.getFirst().getHref());
+		assertEquals("http://some.org", pagedLinksInformation.getNext().getHref());
 		assertNull(pagedLinksInformation.getPrev());
-		assertThat(pagedLinksInformation.getLast().getHref(), equalTo("http://some.org"));
+		assertEquals("http://some.org", pagedLinksInformation.getLast().getHref());
 	}
 }

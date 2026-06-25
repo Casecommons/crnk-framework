@@ -6,7 +6,7 @@ import io.crnk.test.mock.TestModule;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.jetty.JettyTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.client.Entity;

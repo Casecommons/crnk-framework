@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.query;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import io.crnk.data.jpa.internal.query.backend.querydsl.QuerydslTupleImpl;
@@ -17,6 +19,7 @@ public class QueryDslTupleImplTest {
 	private Expression expression;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 
 		expression = Mockito.mock(Expression.class);

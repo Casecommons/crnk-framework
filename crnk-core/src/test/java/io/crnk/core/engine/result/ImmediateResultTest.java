@@ -1,12 +1,13 @@
 package io.crnk.core.engine.result;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ImmediateResultTest {
 
@@ -15,43 +16,47 @@ public class ImmediateResultTest {
 
 	@Test
 	public void checkNotAsync() {
-		Assert.assertFalse(resultFactory.isAsync());
+		Assertions.assertFalse(resultFactory.isAsync());
 
 	}
 
 	@Test
 	public void checkContextAccess() throws ExecutionException, InterruptedException {
 		Object context = new Object();
-		Assert.assertFalse(resultFactory.hasThreadContext());
+		Assertions.assertFalse(resultFactory.hasThreadContext());
 		resultFactory.setThreadContext(context);
-		Assert.assertSame(context, resultFactory.getThreadContext());
-		Assert.assertTrue(resultFactory.hasThreadContext());
+		Assertions.assertSame(context, resultFactory.getThreadContext());
+		Assertions.assertTrue(resultFactory.hasThreadContext());
 
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		try {
 			Future<?> future = executorService.submit(new Runnable() {
 				@Override
 				public void run() {
-					Assert.assertFalse(resultFactory.hasThreadContext());
+					Assertions.assertFalse(resultFactory.hasThreadContext());
 				}
 			});
 			future.get();
 
-			Assert.assertFalse(resultFactory.isAsync());
+			Assertions.assertFalse(resultFactory.isAsync());
 		} finally {
 			executorService.shutdownNow();
 		}
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void subscribeNotSupported() {
-		Result<Object> result = resultFactory.just(new Object());
-		result.subscribe(null, null);
+	    assertThrows(UnsupportedOperationException.class, () -> {
+    		Result<Object> result = resultFactory.just(new Object());
+    		result.subscribe(null, null);
+	    });
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void onErrorResumeNotSupported() {
-		Result<Object> result = resultFactory.just(new Object());
-		result.onErrorResume(null);
+	    assertThrows(UnsupportedOperationException.class, () -> {
+    		Result<Object> result = resultFactory.just(new Object());
+    		result.onErrorResume(null);
+	    });
 	}
 }

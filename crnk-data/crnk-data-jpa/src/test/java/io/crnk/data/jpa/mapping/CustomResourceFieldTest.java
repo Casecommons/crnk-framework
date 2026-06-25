@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.mapping;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.engine.information.resource.ResourceField;
 import io.crnk.core.engine.information.resource.ResourceFieldAccess;
 import io.crnk.core.engine.information.resource.ResourceFieldAccessor;
@@ -43,6 +45,7 @@ public class CustomResourceFieldTest extends AbstractJpaJerseyTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
 

@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.meta;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.core.queryspec.FilterSpec;
 import io.crnk.core.queryspec.PathSpec;
@@ -26,6 +28,7 @@ public class JpaMetaEndToEndTest extends AbstractJpaJerseyTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
     }

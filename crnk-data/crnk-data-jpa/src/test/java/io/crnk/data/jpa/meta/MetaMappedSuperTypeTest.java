@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.meta;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.data.jpa.model.TestMappedSuperclass;
 import io.crnk.meta.MetaLookupImpl;
 import io.crnk.meta.model.MetaElement;
@@ -14,6 +16,7 @@ public class MetaMappedSuperTypeTest {
 	private JpaMetaProvider metaProvider;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();

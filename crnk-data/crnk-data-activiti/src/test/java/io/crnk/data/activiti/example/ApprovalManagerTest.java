@@ -19,9 +19,9 @@ import io.crnk.test.mock.models.Schedule;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.runtime.Execution;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -39,7 +39,7 @@ public class ApprovalManagerTest {
 
 	private Schedule originalResource;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		runtimeService = Mockito.mock(RuntimeService.class);
 		TaskService taskService = Mockito.mock(TaskService.class);
@@ -77,20 +77,20 @@ public class ApprovalManagerTest {
 		changedEntity.setId(mockId);
 		changedEntity.setName("John");
 
-		Assert.assertFalse(manager.needsApproval(changedEntity, HttpMethod.POST));
-		Assert.assertTrue(manager.needsApproval(changedEntity, HttpMethod.PATCH));
+		Assertions.assertFalse(manager.needsApproval(changedEntity, HttpMethod.POST));
+		Assertions.assertTrue(manager.needsApproval(changedEntity, HttpMethod.PATCH));
 		manager.requestApproval(changedEntity, HttpMethod.PATCH);
 		ArgumentCaptor<Map> processVariablesCaptor = ArgumentCaptor.forClass(Map.class);
 		Mockito.verify(runtimeService, Mockito.times(1))
 				.startProcessInstanceByKey(Mockito.eq("scheduleChange"), processVariablesCaptor.capture());
 		Map processVariables = processVariablesCaptor.getValue();
 
-		Assert.assertEquals(7, processVariables.size());
-		Assert.assertEquals(mockId.toString(), processVariables.get("resourceId"));
-		Assert.assertEquals("schedule", processVariables.get("resourceType"));
-		Assert.assertEquals("John", processVariables.get("newValues.name"));
-		Assert.assertEquals("Jane", processVariables.get("previousValues.name"));
-		Assert.assertEquals("SHIPPED", processVariables.get("status"));
+		Assertions.assertEquals(7, processVariables.size());
+		Assertions.assertEquals(mockId.toString(), processVariables.get("resourceId"));
+		Assertions.assertEquals("schedule", processVariables.get("resourceType"));
+		Assertions.assertEquals("John", processVariables.get("newValues.name"));
+		Assertions.assertEquals("Jane", processVariables.get("previousValues.name"));
+		Assertions.assertEquals("SHIPPED", processVariables.get("status"));
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class ApprovalManagerTest {
 
 		// check value updated on original resource
 		Schedule savedEntity = (Schedule) savedEntityCaptor.getValue();
-		Assert.assertSame(originalResource, savedEntity);
-		Assert.assertEquals("John", savedEntity.getName());
+		Assertions.assertSame(originalResource, savedEntity);
+		Assertions.assertEquals("John", savedEntity.getName());
 	}
 }

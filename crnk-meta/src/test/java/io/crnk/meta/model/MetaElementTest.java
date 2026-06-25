@@ -1,18 +1,23 @@
 package io.crnk.meta.model;
 
 import io.crnk.meta.AbstractMetaTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MetaElementTest extends AbstractMetaTest {
 
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void checkDataObjectCast() {
-		new MetaKey().asDataObject();
+		assertThrows(IllegalStateException.class, () -> {
+			new MetaKey().asDataObject();
+		});
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void checkTypeCast() {
-		new MetaKey().asType();
+		assertThrows(IllegalStateException.class, () -> {
+			new MetaKey().asType();
+		});
 	}
 }

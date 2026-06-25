@@ -1,5 +1,9 @@
 package io.crnk.data.jpa;
 
+import org.junit.jupiter.api.AfterEach;
+
+import org.junit.jupiter.api.BeforeEach;
+
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.crnk.client.CrnkClient;
 import io.crnk.client.http.okhttp.OkHttpAdapter;
@@ -59,6 +63,7 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
     }
 
     @Before
+    @BeforeEach
     public void setup() {
         client = new CrnkClient(getBaseUri().toString());
         client.getObjectMapper().registerModule(new JavaTimeModule());
@@ -82,6 +87,7 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
 
     @Override
     @After
+    @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
 

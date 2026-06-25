@@ -1,14 +1,14 @@
 package io.crnk.test;
 
 import org.glassfish.jersey.test.JerseyTest;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 
 public class JerseyTestBase extends JerseyTest {
 
-	@BeforeClass
+	@BeforeAll
 	public static void selectPort() {
 		// Retry to reduce TOCTOU race window when selecting a free port
 		for (int attempt = 0; attempt < 10; attempt++) {

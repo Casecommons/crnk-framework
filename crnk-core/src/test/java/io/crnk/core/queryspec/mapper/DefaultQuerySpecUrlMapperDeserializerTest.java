@@ -6,32 +6,35 @@ import io.crnk.core.exception.ParametersDeserializationException;
 import io.crnk.core.mock.models.Project;
 import io.crnk.core.mock.models.Task;
 import io.crnk.core.queryspec.QuerySpec;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DefaultQuerySpecUrlMapperDeserializerTest extends DefaultQuerySpecUrlMapperDeserializerTestBase {
 
 
     private QueryContext queryContext = new QueryContext().setRequestVersion(0);
 
-    @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         urlMapper.setEnforceDotPathSeparator(true);
-        Assert.assertTrue(urlMapper.getEnforceDotPathSeparator());
+        Assertions.assertTrue(urlMapper.getEnforceDotPathSeparator());
     }
 
-    @Test(expected = ParametersDeserializationException.class)
+    @Test
     public void testDotNotationDisallowsBrackets() {
-        Map<String, Set<String>> params = new HashMap<>();
-        add(params, "filter[projects][tasks][name]", "test");
-        urlMapper.deserialize(taskInformation, params, queryContext);
+        assertThrows(ParametersDeserializationException.class, () -> {
+            Map<String, Set<String>> params = new HashMap<>();
+            add(params, "filter[projects][tasks][name]", "test");
+            urlMapper.deserialize(taskInformation, params, queryContext);
+        });
     }
 
     @Test
@@ -40,9 +43,9 @@ public class DefaultQuerySpecUrlMapperDeserializerTest extends DefaultQuerySpecU
         add(params, "filter[deleted]", "true");
         try {
             urlMapper.deserialize(taskInformation, params, queryContext);
-            Assert.fail();
+            Assertions.fail();
         } catch (BadRequestException e) {
-            Assert.assertEquals("path [deleted] is not filterable", e.getMessage());
+            Assertions.assertEquals("path [deleted] is not filterable", e.getMessage());
         }
     }
 
@@ -52,9 +55,9 @@ public class DefaultQuerySpecUrlMapperDeserializerTest extends DefaultQuerySpecU
         add(params, "sort", "deleted");
         try {
             urlMapper.deserialize(taskInformation, params, queryContext);
-            Assert.fail();
+            Assertions.fail();
         } catch (BadRequestException e) {
-            Assert.assertEquals("path [deleted] is not sortable", e.getMessage());
+            Assertions.assertEquals("path [deleted] is not sortable", e.getMessage());
         }
     }
 
@@ -66,11 +69,11 @@ public class DefaultQuerySpecUrlMapperDeserializerTest extends DefaultQuerySpecU
         // projects
         add(params, "filter[projects][name]", "test");
         QuerySpec querySpec = urlMapper.deserialize(taskInformation, params, queryContext);
-        Assert.assertEquals(Task.class, querySpec.getResourceClass());
-        Assert.assertEquals(0, querySpec.getFilters().size());
+        Assertions.assertEquals(Task.class, querySpec.getResourceClass());
+        Assertions.assertEquals(0, querySpec.getFilters().size());
         QuerySpec projectQuerySpec = querySpec.getQuerySpec(Project.class);
-        Assert.assertEquals(1, projectQuerySpec.getFilters().size());
-        Assert.assertEquals(Arrays.asList("name"), projectQuerySpec.getFilters().get(0).getAttributePath());
+        Assertions.assertEquals(1, projectQuerySpec.getFilters().size());
+        Assertions.assertEquals(Arrays.asList("name"), projectQuerySpec.getFilters().get(0).getAttributePath());
     }
 
     @Test
@@ -81,8 +84,8 @@ public class DefaultQuerySpecUrlMapperDeserializerTest extends DefaultQuerySpecU
         add(params, "filter[projects]", "someValue");
         urlMapper.setIgnoreParseExceptions(true);
         QuerySpec querySpec = urlMapper.deserialize(taskInformation, params, queryContext);
-        Assert.assertEquals(Task.class, querySpec.getResourceClass());
-        Assert.assertEquals(Arrays.asList("projects"), querySpec.getFilters().get(0).getAttributePath());
-        Assert.assertNull(querySpec.getQuerySpec(Project.class));
+        Assertions.assertEquals(Task.class, querySpec.getResourceClass());
+        Assertions.assertEquals(Arrays.asList("projects"), querySpec.getFilters().get(0).getAttributePath());
+        Assertions.assertNull(querySpec.getQuerySpec(Project.class));
     }
 }

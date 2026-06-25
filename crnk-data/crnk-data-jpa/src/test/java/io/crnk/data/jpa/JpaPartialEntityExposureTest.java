@@ -1,5 +1,9 @@
 package io.crnk.data.jpa;
 
+import org.junit.jupiter.api.AfterEach;
+
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.engine.information.resource.ResourceField;
 import io.crnk.core.engine.information.resource.ResourceInformation;
 import io.crnk.core.engine.properties.NullPropertiesProvider;
@@ -25,6 +29,7 @@ public class JpaPartialEntityExposureTest extends AbstractJpaJerseyTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         testRepo = client.getRepositoryForType(TestEntity.class);
@@ -38,6 +43,7 @@ public class JpaPartialEntityExposureTest extends AbstractJpaJerseyTest {
 
     @Override
     @After
+    @AfterEach
     public void tearDown() throws Exception {
         super.tearDown();
     }

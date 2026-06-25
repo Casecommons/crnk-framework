@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.meta;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.data.jpa.model.AnnotationTestEntity;
 import io.crnk.data.jpa.model.TestEntity;
 import io.crnk.meta.MetaLookupImpl;
@@ -16,6 +18,7 @@ public class JpaNullabilityMetaTest {
 	private JpaMetaProvider metaProvider;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();

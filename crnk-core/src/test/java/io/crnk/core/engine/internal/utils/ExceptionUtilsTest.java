@@ -1,10 +1,11 @@
 package io.crnk.core.engine.internal.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.concurrent.Callable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class ExceptionUtilsTest {
@@ -16,13 +17,13 @@ public class ExceptionUtilsTest {
 
 	@Test
 	public void testNoError() {
-		Assert.assertEquals(13, ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
+		Assertions.assertEquals(13, ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
 			@Override
 			public Object call() {
 				return 13;
 			}
 		}));
-		Assert.assertEquals(13, ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
+		Assertions.assertEquals(13, ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
 			@Override
 			public Object call() {
 				return 13;
@@ -31,24 +32,28 @@ public class ExceptionUtilsTest {
 	}
 
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testRuntimeException() {
-		ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
-			@Override
-			public Object call() {
-				throw new IllegalArgumentException();
-			}
-		});
+	    assertThrows(IllegalArgumentException.class, () -> {
+    		ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
+    			@Override
+    			public Object call() {
+    				throw new IllegalArgumentException();
+    			}
+    		});
+	    });
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testCheckedException() {
-		ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
-			@Override
-			public Object call() throws Exception {
-				throw new IOException();
-			}
-		});
+	    assertThrows(IllegalStateException.class, () -> {
+    		ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
+    			@Override
+    			public Object call() throws Exception {
+    				throw new IOException();
+    			}
+    		});
+	    });
 	}
 
 
@@ -61,10 +66,10 @@ public class ExceptionUtilsTest {
 					throw new IllegalArgumentException();
 				}
 			}, "test %s", 13);
-			Assert.fail();
+			Assertions.fail();
 		} catch (IllegalStateException e) {
-			Assert.assertEquals("test 13", e.getMessage());
-			Assert.assertTrue(e.getCause() instanceof IllegalArgumentException);
+			Assertions.assertEquals("test 13", e.getMessage());
+			Assertions.assertTrue(e.getCause() instanceof IllegalArgumentException);
 		}
 	}
 

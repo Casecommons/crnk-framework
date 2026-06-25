@@ -23,10 +23,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PlainTextFormatIntTest extends JerseyTestBase {
 
@@ -48,7 +48,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 		return uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		ProjectRepository projectRepository = new ProjectRepository();
 		Project project = new Project();
@@ -64,7 +64,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 		taskRepository.save(task);
 	}
 
-	@After
+	@AfterEach
 	public void cleanup() {
 		TestModule.clear();
 	}
@@ -72,7 +72,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 	@Test
 	public void checkGet() {
 		Response getResponse = RestAssured.get(baseUrl() + "/tasks/12?include=project");
-		Assert.assertEquals(200, getResponse.getStatusCode());
+		Assertions.assertEquals(200, getResponse.getStatusCode());
 		getResponse.then().assertThat().body("data.id", Matchers.equalTo("12"));
 		getResponse.then().assertThat().body("data.type", Matchers.equalTo("tasks"));
 		getResponse.then().assertThat().body("data.name", Matchers.equalTo("someTask"));
@@ -87,7 +87,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 		CrnkClient client = new CrnkClient(baseUrl());
 		ResourceRepository<Task, Serializable> repository = client.getRepositoryForType(Task.class);
 		Task createdTask = repository.findOne(12L, new QuerySpec(Task.class));
-		Assert.assertEquals("someTask", createdTask.getName());
+		Assertions.assertEquals("someTask", createdTask.getName());
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class PlainTextFormatIntTest extends JerseyTestBase {
 		CrnkClient client = new CrnkClient(baseUrl());
 		ResourceRepository<Task, Serializable> repository = client.getRepositoryForType(Task.class);
 		Task createdTask = repository.findOne(13L, new QuerySpec(Task.class));
-		Assert.assertEquals("otherTask", createdTask.getName());
+		Assertions.assertEquals("otherTask", createdTask.getName());
 	}
 
 	@ApplicationPath("/")

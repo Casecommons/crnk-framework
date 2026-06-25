@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.util;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.data.jpa.internal.query.AnyUtils;
 import io.crnk.data.jpa.meta.JpaMetaProvider;
 import io.crnk.data.jpa.model.TestAnyType;
@@ -18,6 +20,7 @@ public class AnyTypeUtilsTest {
 	private JpaMetaProvider metaProvider;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();

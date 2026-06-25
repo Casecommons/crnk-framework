@@ -1,19 +1,22 @@
 package io.crnk.gen.typescript.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
 
 public class TSFunctionTest {
 
 	@Test
 	public void notAField() {
 		TSFunction function = new TSFunction();
-		Assert.assertFalse(function.isField());
+		Assertions.assertFalse(function.isField());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void cannotCastToField() {
-		TSFunction function = new TSFunction();
-		function.asField();
+		assertThrows(UnsupportedOperationException.class, () -> {
+			TSFunction function = new TSFunction();
+			function.asField();
+		});
 	}
 }

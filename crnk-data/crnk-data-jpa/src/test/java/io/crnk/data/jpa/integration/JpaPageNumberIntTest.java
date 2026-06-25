@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.integration;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.resource.meta.JsonLinksInformation;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.queryspec.QuerySpec;
@@ -22,6 +24,7 @@ public class JpaPageNumberIntTest extends AbstractJpaJerseyTest {
 
 	@Override
 	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		client.addModule(NumberSizePagingBehavior.createModule());

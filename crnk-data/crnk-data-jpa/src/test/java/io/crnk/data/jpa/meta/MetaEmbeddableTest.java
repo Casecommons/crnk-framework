@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.meta;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.data.jpa.model.TestEmbeddableBase;
 import io.crnk.data.jpa.model.TestEmbeddable;
 import io.crnk.meta.MetaLookupImpl;
@@ -15,6 +17,7 @@ public class MetaEmbeddableTest {
 	private JpaMetaProvider metaProvider;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();

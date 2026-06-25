@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.query;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.registry.ResourceRegistry;
 import io.crnk.core.engine.url.ConstantServiceUrlProvider;
@@ -122,6 +124,7 @@ public abstract class AbstractJpaTest {
     }
 
     @Before
+    @BeforeEach
     public void setup() {
         boot = new CrnkBoot();
 

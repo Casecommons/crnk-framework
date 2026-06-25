@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.internal.facet;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
@@ -32,6 +34,7 @@ public class JpaFacetProviderTest extends AbstractJpaJerseyTest {
 
 	@Override
 	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		testRepo = client.getRepositoryForType(TestEntity.class);

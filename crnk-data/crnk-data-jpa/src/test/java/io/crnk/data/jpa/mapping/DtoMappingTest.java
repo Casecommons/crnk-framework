@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.mapping;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import com.querydsl.jpa.JPAExpressions;
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.core.queryspec.FilterSpec;
@@ -47,6 +49,7 @@ public class DtoMappingTest extends AbstractJpaJerseyTest {
 
 	@Override
 	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 		testRepo = client.getRepositoryForType(TestEntity.class);

@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.meta;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.data.jpa.model.NamingTestEntity;
 import io.crnk.data.jpa.model.RelatedEntity;
 import io.crnk.data.jpa.model.TestEntity;
@@ -20,6 +22,7 @@ public class JpaMetaProviderAttributeTest {
 	private JpaMetaProvider metaProvider;
 
 	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();

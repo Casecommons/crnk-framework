@@ -33,12 +33,10 @@ import io.crnk.core.module.Module;
 import io.crnk.core.repository.ResourceRepository;
 import io.crnk.core.resource.annotations.JsonApiId;
 import io.crnk.core.resource.annotations.JsonApiResource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
@@ -58,16 +56,13 @@ import static org.mockito.Mockito.when;
 
 public class HttpRequestDispatcherImplTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     private DocumentFilter documentFilter = Mockito.spy(AbstractDocumentFilter.class);
 
     private JsonApiRequestProcessor requestProcessor;
 
     private CoreTestContainer container;
 
-    @Before
+    @BeforeEach
     public void prepare() {
         container = new CoreTestContainer();
         container.addModule(new CoreTestModule());
@@ -225,7 +220,7 @@ public class HttpRequestDispatcherImplTest {
                 .handleAsync(any(JsonPath.class), any(QueryAdapter.class), Mockito.nullable(Document.class));
     }
 
-    @Ignore // FIXME reasonable action contributions
+    @Disabled // FIXME reasonable action contributions
     @Test
     public void shouldNotifyWhenActionIsExeecuted() {
         // GIVEN
@@ -245,8 +240,8 @@ public class HttpRequestDispatcherImplTest {
         Mockito.verify(documentFilter, Mockito.times(1)).filter(filterContextCaptor.capture(), Mockito.any
                 (DocumentFilterChain.class));
         DocumentFilterContext filterContext = filterContextCaptor.getValue();
-        Assert.assertEquals("GET", filterContext.getMethod());
-        Assert.assertTrue(filterContext.getJsonPath() instanceof ActionPath);
+        Assertions.assertEquals("GET", filterContext.getMethod());
+        Assertions.assertTrue(filterContext.getJsonPath() instanceof ActionPath);
     }
 
 
@@ -278,6 +273,6 @@ public class HttpRequestDispatcherImplTest {
 
         Map<String, Set<String>> params = new HashMap<>();
         Response response = requestDispatcher.dispatchRequest("tasks", HttpMethod.GET.toString(), params, null);
-        Assert.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.getHttpStatus().intValue());
+        Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, response.getHttpStatus().intValue());
     }
 }

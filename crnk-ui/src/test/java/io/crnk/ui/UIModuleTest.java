@@ -1,5 +1,7 @@
 package io.crnk.ui;
 
+import org.junit.jupiter.api.BeforeEach;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -14,13 +16,13 @@ import io.crnk.core.module.ModuleRegistry;
 import io.crnk.home.HomeModule;
 import io.crnk.test.mock.ClassTestUtils;
 import io.crnk.ui.internal.UIHttpRequestProcessor;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-@Ignore // UI module currently disabled/not maintained
+@Disabled // UI module currently disabled/not maintained
 public class UIModuleTest {
 
 
@@ -29,11 +31,12 @@ public class UIModuleTest {
 		UIModuleConfig config = new UIModuleConfig();
 		config.setPath("something");
 		UIModule module = UIModule.create(config);
-		Assert.assertEquals("ui", module.getModuleName());
-		Assert.assertEquals("something", module.getConfig().getPath());
+		Assertions.assertEquals("ui", module.getModuleName());
+		Assertions.assertEquals("something", module.getConfig().getPath());
 	}
 
 	@Test
+	@BeforeEach
 	public void setup() {
 		UIModule module = UIModule.create(new UIModuleConfig());
 
@@ -64,8 +67,8 @@ public class UIModuleTest {
 		ArgumentCaptor<HttpResponse> responseCaptor = ArgumentCaptor.forClass(HttpResponse.class);
 		Mockito.verify(context, Mockito.times(1)).setResponse(responseCaptor.capture());
 		HttpResponse response = responseCaptor.getValue();
-		Assert.assertEquals(200, response.getStatusCode());
-		Assert.assertEquals("text/html", response.getContentType());
+		Assertions.assertEquals(200, response.getStatusCode());
+		Assertions.assertEquals("text/html", response.getContentType());
 	}
 
 
@@ -108,7 +111,7 @@ public class UIModuleTest {
 		boot.boot();
 
 		List<String> list = homeModule.list("/", new QueryContext());
-		Assert.assertTrue(list.contains("browse/"));
+		Assertions.assertTrue(list.contains("browse/"));
 	}
 
 	@Test
@@ -132,7 +135,7 @@ public class UIModuleTest {
 
 		Mockito.verify(context, Mockito.times(1)).setResponse(responseCaptor.capture());
 		HttpResponse response = responseCaptor.getValue();
-		Assert.assertEquals(200, response.getStatusCode());
+		Assertions.assertEquals(200, response.getStatusCode());
 	}
 
 

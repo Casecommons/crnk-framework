@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.repository;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.client.CrnkClient;
 import io.crnk.client.http.inmemory.InMemoryHttpAdapter;
 import io.crnk.client.internal.proxy.ObjectProxy;
@@ -32,6 +34,7 @@ public class EmbeddedIdJpaTest extends AbstractJpaTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
 

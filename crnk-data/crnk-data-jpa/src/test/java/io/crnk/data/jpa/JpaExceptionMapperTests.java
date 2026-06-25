@@ -1,5 +1,7 @@
 package io.crnk.data.jpa;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.error.ErrorResponse;
@@ -23,6 +25,7 @@ public class JpaExceptionMapperTests {
     private CrnkBoot boot;
 
     @Before
+    @BeforeEach
     public void setup() {
         boot = new CrnkBoot();
         boot.addModule(JpaModule.newClientModule());

@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.repository;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.resource.list.ResourceList;
 import io.crnk.data.jpa.JpaEntityRepository;
@@ -30,6 +32,7 @@ public class JpaRepositoryFilterTest extends AbstractJpaTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
 

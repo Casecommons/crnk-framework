@@ -8,8 +8,8 @@ import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.repository.RelationshipRepository;
 import io.crnk.core.repository.decorate.WrappedRelationshipRepository;
 import io.crnk.core.repository.decorate.WrappedResourceRepository;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class DecoratorTest {
@@ -19,7 +19,7 @@ public class DecoratorTest {
     public void testDecoratedResourceRepositoryBase() {
         ScheduleRepository repository = Mockito.mock(ScheduleRepository.class);
         WrappedResourceRepository<Schedule, Long> decorator = new WrappedResourceRepository<>(repository);
-        Assert.assertSame(repository, decorator.getWrappedObject());
+        Assertions.assertSame(repository, decorator.getWrappedObject());
 
         decorator.create(null);
         Mockito.verify(repository, Mockito.times(1)).create(Mockito.nullable(Schedule.class));

@@ -11,6 +11,7 @@ import io.crnk.core.engine.properties.PropertiesProvider;
 public class ObjectLinkDocumentMapperTest extends DocumentMapperTest {
 
 	@Override
+	@org.junit.jupiter.api.BeforeEach
 	public void setup() {
 		super.setup();
 		objectMapper.registerModule(JacksonModule.createJacksonModule(true));

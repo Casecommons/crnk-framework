@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.information;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.information.resource.ResourceField;
 import io.crnk.core.engine.information.resource.ResourceFieldType;
@@ -50,6 +52,7 @@ public class JpaResourceInformationProviderTest {
     private JpaMetaProvider jpaMetaProvider;
 
     @Before
+    @BeforeEach
     public void setup() {
         jpaMetaProvider = new JpaMetaProvider(Collections.emptySet());
         MetaLookupImpl lookup = new MetaLookupImpl();

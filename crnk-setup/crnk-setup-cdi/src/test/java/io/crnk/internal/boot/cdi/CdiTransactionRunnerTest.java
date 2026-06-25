@@ -5,10 +5,10 @@ import io.crnk.core.engine.transaction.TransactionRunner;
 import io.crnk.core.module.discovery.DefaultServiceDiscoveryFactory;
 import io.crnk.core.module.discovery.ServiceDiscovery;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
+import org.junit.runner.RunWith;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import jakarta.enterprise.context.ApplicationScoped;

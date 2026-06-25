@@ -1,5 +1,7 @@
 package io.crnk.data.jpa.integration;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import io.crnk.core.exception.ResourceNotFoundException;
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.core.queryspec.FilterSpec;
@@ -32,6 +34,7 @@ public class JpaQuerySpecIntTest extends AbstractJpaJerseyTest {
 
     @Override
     @Before
+    @BeforeEach
     public void setup() {
         super.setup();
         testRepo = client.getRepositoryForType(TestEntity.class);

@@ -11,9 +11,9 @@ import io.crnk.internal.boot.cdi.model.CdiTestExceptionMapper;
 import io.crnk.internal.boot.cdi.model.ProjectRepository;
 import io.crnk.internal.boot.cdi.model.TaskRepository;
 import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
+import org.junit.runner.RunWith;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 import jakarta.enterprise.context.ApplicationScoped;

@@ -1,11 +1,11 @@
 package io.crnk.client.suite;
 
 import io.crnk.test.suite.RelationIdAccessTestBase;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class RelationIdClientTest extends RelationIdAccessTestBase {
 
-	@BeforeClass
+	@BeforeAll
 	public static void prepare() {
 		ClientTestContainer.prepare();
 	}

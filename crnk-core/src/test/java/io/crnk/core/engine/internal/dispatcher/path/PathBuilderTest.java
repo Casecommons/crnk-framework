@@ -14,27 +14,23 @@ import io.crnk.core.repository.InMemoryResourceRepository;
 import io.crnk.core.resource.annotations.JsonApiExposed;
 import io.crnk.core.resource.annotations.JsonApiId;
 import io.crnk.core.resource.annotations.JsonApiResource;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PathBuilderTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private PathBuilder pathBuilder;
 
     private QueryContext queryContext = new QueryContext().setRequestVersion(0);
 
-    @Before
+    @BeforeEach
     public void prepare() {
         SimpleModule notExposedModule = new SimpleModule("notExposed");
         notExposedModule.addRepository(new NotExposedRepository());
@@ -131,8 +127,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals("someRepositoryAction", jsonPath.getActionName());
-        Assert.assertNull(jsonPath.getIds());
+        Assertions.assertEquals("someRepositoryAction", jsonPath.getActionName());
+        Assertions.assertNull(jsonPath.getIds());
         assertThat(jsonPath.toGroupPath()).isEqualTo("tasks/someRepositoryAction");
     }
 
@@ -146,8 +142,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals("someResourceAction", jsonPath.getActionName());
-        Assert.assertEquals(123L, jsonPath.getId());
+        Assertions.assertEquals("someResourceAction", jsonPath.getActionName());
+        Assertions.assertEquals(123L, jsonPath.getId());
         assertThat(jsonPath.toGroupPath()).isEqualTo("tasks/{id}/someResourceAction");
     }
 
@@ -162,8 +158,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals(1L, jsonPath.getId());
-        Assert.assertEquals("project", jsonPath.getField().getJsonName());
+        Assertions.assertEquals(1L, jsonPath.getId());
+        Assertions.assertEquals("project", jsonPath.getField().getJsonName());
         assertThat(jsonPath.toGroupPath()).isEqualTo("tasks/{id}/project");
     }
 
@@ -173,10 +169,11 @@ public class PathBuilderTest {
         String path = "/tasks/1/project/2";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
     }
 
     @Test
@@ -189,8 +186,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals(1L, jsonPath.getId());
-        Assert.assertEquals("project", jsonPath.getRelationship().getJsonName());
+        Assertions.assertEquals(1L, jsonPath.getId());
+        Assertions.assertEquals("project", jsonPath.getRelationship().getJsonName());
         assertThat(jsonPath.toGroupPath()).isEqualTo("tasks/{id}/relationships/project");
     }
 
@@ -200,10 +197,11 @@ public class PathBuilderTest {
         String path = "/tasks/1/relationships/name/";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
     }
 
     @Test
@@ -212,11 +210,12 @@ public class PathBuilderTest {
         String path = "/users/1/relationships/projects";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
-        expectedException.expectMessage("projects");
+        Exception e = assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
+        Assertions.assertTrue(e.getMessage().contains("projects"));
     }
 
     @Test
@@ -225,10 +224,11 @@ public class PathBuilderTest {
         String path = "/tasks/1/relationships/";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
     }
 
     @Test
@@ -237,10 +237,11 @@ public class PathBuilderTest {
         String path = "/tasks/1/relationships/project/1";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
     }
 
     @Test
@@ -249,11 +250,12 @@ public class PathBuilderTest {
         String path = "/tasks/1/nonExistingField/";
 
         // THEN
-        expectedException.expect(BadRequestException.class);
-        expectedException.expectMessage("nonExistingField");
+        Exception e = assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        pathBuilder.build(path, queryContext);
+            // WHEN
+            pathBuilder.build(path, queryContext);
+        });
+        Assertions.assertTrue(e.getMessage().contains("nonExistingField"));
     }
 
 
@@ -267,8 +269,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("oneNested");
-        Assert.assertEquals("1", jsonPath.getId());
-        Assert.assertEquals("oneNested", jsonPath.getParentField().getUnderlyingName());
+        Assertions.assertEquals("1", jsonPath.getId());
+        Assertions.assertEquals("oneNested", jsonPath.getParentField().getUnderlyingName());
         assertThat(jsonPath.toGroupPath()).isEqualTo("test/{id}/oneNested");
     }
 
@@ -282,8 +284,8 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("test");
-        Assert.assertEquals("1", jsonPath.getId());
-        Assert.assertEquals("manyNested", jsonPath.getField().getUnderlyingName());
+        Assertions.assertEquals("1", jsonPath.getId());
+        Assertions.assertEquals("manyNested", jsonPath.getField().getUnderlyingName());
         assertThat(jsonPath.toGroupPath()).isEqualTo("test/{id}/manyNested");
     }
 
@@ -297,21 +299,21 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("manyNested");
-        Assert.assertEquals("1-2", jsonPath.getId().toString());
-        Assert.assertEquals("manyNested", jsonPath.getParentField().getUnderlyingName());
+        Assertions.assertEquals("1-2", jsonPath.getId().toString());
+        Assertions.assertEquals("manyNested", jsonPath.getParentField().getUnderlyingName());
         assertThat(jsonPath.toGroupPath()).isEqualTo("test/{id}/manyNested/{id}");
     }
 
     @Test
     public void onNonExistingResourceShouldThrowException() {
         String path = "/nonExistingResource";
-        Assert.assertNull(pathBuilder.build(path, queryContext));
+        Assertions.assertNull(pathBuilder.build(path, queryContext));
     }
 
     @Test
     public void onResourceStaringWithRelationshipsShouldThrowException() {
         String path = "/relationships";
-        Assert.assertNull(pathBuilder.build(path, queryContext));
+        Assertions.assertNull(pathBuilder.build(path, queryContext));
     }
 
     @Test
@@ -324,7 +326,7 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals(Arrays.asList(1L, 2L), jsonPath.getIds());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), jsonPath.getIds());
         assertThat(jsonPath.toGroupPath()).isEqualTo("tasks/{id}");
     }
 
@@ -338,13 +340,13 @@ public class PathBuilderTest {
 
         // THEN
         assertThat(jsonPath.getRootEntry().getResourceInformation().getResourceType()).isEqualTo("tasks");
-        Assert.assertEquals(Arrays.asList(1L, 2L), jsonPath.getIds());
+        Assertions.assertEquals(Arrays.asList(1L, 2L), jsonPath.getIds());
     }
 
     @Test
     public void ignoreEntriesNotBeingExposed() {
         String path = "/notExposed/1/";
         JsonPath jsonPath = pathBuilder.build(path, queryContext);
-        Assert.assertNull(jsonPath);
+        Assertions.assertNull(jsonPath);
     }
 }
