@@ -11,7 +11,7 @@ public class SpringMetaResolver implements RuntimeMetaResolver {
     public void run(RuntimeContext context, ClassLoader classLoader) {
         try {
             Class<?> runnerClass = classLoader.loadClass(SpringRunner.class.getName());
-            Object runner = runnerClass.newInstance();
+            Object runner = runnerClass.getConstructor().newInstance();
             Method method = runnerClass.getMethod("run", RuntimeContext.class);
             method.invoke(runner, context);
         } catch (Exception e) {

@@ -1,6 +1,5 @@
 package io.crnk.core.engine.information.contributor;
 
-import com.google.common.collect.Sets;
 import io.crnk.core.CoreTestContainer;
 import io.crnk.core.engine.dispatcher.Response;
 import io.crnk.core.engine.document.Document;
@@ -93,7 +92,7 @@ public class ResourceFieldContributorTest {
         HttpRequestDispatcherImpl requestDispatcher = container.getBoot().getRequestDispatcher();
 
         Map<String, Set<String>> parameters = new HashMap<>();
-        parameters.put("include", Sets.newHashSet("contributedProject"));
+        parameters.put("include", Set.of("contributedProject"));
         Response response = requestDispatcher.dispatchRequest("tasks", "GET", parameters, null);
 
         Document document = response.getDocument();

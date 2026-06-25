@@ -10,6 +10,9 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class FieldOrderedComparatorTest {
@@ -35,7 +38,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldB);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -50,7 +53,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldB);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -63,7 +66,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldA);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -76,6 +79,6 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldA);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldA, fieldB);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldA, fieldB);
 	}
 }

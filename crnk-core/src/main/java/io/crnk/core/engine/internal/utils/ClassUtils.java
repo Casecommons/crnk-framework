@@ -292,8 +292,8 @@ public class ClassUtils {
 	 */
 	public static <T> T newInstance(Class<T> clazz) {
 		try {
-			return clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return clazz.getConstructor().newInstance();
+		} catch (ReflectiveOperationException e) {
 			throw new ResourceException(String.format("couldn't create a new instance of %s", clazz), e);
 		}
 	}

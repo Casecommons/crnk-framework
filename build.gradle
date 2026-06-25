@@ -89,7 +89,7 @@ gradle.beforeProject { Project project ->
 				dependencies {
 					testImplementation group: 'junit', name: 'junit', version: '4.12'
 					testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
-					testImplementation group: 'org.assertj', name: 'assertj-core', version: '2.2.0'
+					testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
 					// Jakarta EE: common annotations (@PostConstruct, @Generated, @Priority, ...)
 					api group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.1'
 					// Jakarta XML Binding (JAXB) API
@@ -151,7 +151,7 @@ gradle.beforeProject { Project project ->
 						dependency 'com.fasterxml.jackson.core:jackson-core:2.20.0'
 						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
 
-						dependency 'org.reflections:reflections:0.9.11'
+						dependency 'org.reflections:reflections:0.10.2'
 
 						// The Spring Boot 4 BOM pulls JUnit 6.0 / JUnit Platform 6.0, whose engine
 						// is incompatible with the JUnit Platform 1.x launcher bundled by Gradle 8.13

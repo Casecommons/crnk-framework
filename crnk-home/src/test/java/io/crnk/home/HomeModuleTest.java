@@ -10,7 +10,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Sets;
+import java.util.Set;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.http.HttpHeaders;
@@ -118,7 +118,7 @@ public class HomeModuleTest {
 		Mockito.when(context.getMethod()).thenReturn("GET");
 		Mockito.when(context.getPath()).thenReturn("/tasks");
 		Map<String, Set<String>> parameters = new HashMap<>();
-		parameters.put("test", Sets.newHashSet("foo"));
+		parameters.put("test", Set.of("foo"));
 		Mockito.when(context.getRequestParameters()).thenReturn(parameters);
 		Mockito.when(context.getRequestHeader(Mockito.eq(HttpHeaders.HTTP_HEADER_ACCEPT))).thenReturn(HttpHeaders.JSON_CONTENT_TYPE);
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
@@ -147,7 +147,7 @@ public class HomeModuleTest {
 		Mockito.when(context.getMethod()).thenReturn("GET");
 		Mockito.when(context.getPath()).thenReturn("/");
 		Map<String, Set<String>> parameters = new HashMap<>();
-		parameters.put("test", Sets.newHashSet("foo"));
+		parameters.put("test", Set.of("foo"));
 		Mockito.when(context.getRequestParameters()).thenReturn(parameters);
 		Mockito.when(context.getRequestHeader(Mockito.eq(HttpHeaders.HTTP_HEADER_ACCEPT))).thenReturn(HttpHeaders.JSON_CONTENT_TYPE);
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);

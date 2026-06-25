@@ -210,7 +210,7 @@ public class ClassUtilsTest {
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = ResourceException.class)
     public void onClassWithCrushingConstructorShouldThrowException() {
         // WHEN
         ClassUtils.newInstance(ClassWithCrashingConstructor.class);

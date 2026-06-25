@@ -10,7 +10,7 @@ dependencies {
 	api "org.junit.vintage:junit-vintage-engine:$JUNIT_VERSION"
 
 	api 'org.mockito:mockito-core:5.14.2'
-	api 'org.assertj:assertj-core:3.9.1'
+	api 'org.assertj:assertj-core:3.27.3'
 
 	api 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider'
 	api 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

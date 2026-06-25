@@ -2,9 +2,9 @@ package io.crnk.data.jpa.integration;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-
-import com.google.common.collect.Sets;
+import java.util.Set;
 import io.crnk.client.internal.proxy.ObjectProxy;
 import io.crnk.core.queryspec.FilterOperator;
 import io.crnk.core.queryspec.FilterSpec;
@@ -208,7 +208,7 @@ public class JpaRelationshipIntTest extends AbstractJpaJerseyTest {
 				relRepo.addRelations(test, Arrays.asList(related.getId()), "opposites");
 			}
 			else {
-				test.setOpposites(Sets.newHashSet(related));
+				test.setOpposites(new HashSet<>(Set.of(related)));
 				relatedRepo.create(related);
 				testRepo.create(test);
 			}

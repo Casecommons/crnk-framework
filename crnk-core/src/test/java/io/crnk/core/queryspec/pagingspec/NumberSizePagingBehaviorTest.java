@@ -1,7 +1,5 @@
 package io.crnk.core.queryspec.pagingspec;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.crnk.core.engine.internal.registry.ResourceRegistryImpl;
 import io.crnk.core.engine.query.QueryContext;
 import io.crnk.core.engine.registry.DefaultResourceRegistryPart;
@@ -48,7 +46,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(2, null), "tasks");
 
-		assertEquals(ImmutableSet.of("2"), result.get("page[number]"));
+		assertEquals(Set.of("2"), result.get("page[number]"));
 		assertFalse(result.containsKey("page[size]"));
 		assertEquals(1, result.size());
 	}
@@ -59,7 +57,7 @@ public class NumberSizePagingBehaviorTest {
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(1, 30), "tasks");
 
 		assertTrue(result.containsKey("page[number]"));
-		assertEquals(ImmutableSet.of("30"), result.get("page[size]"));
+		assertEquals(Set.of("30"), result.get("page[size]"));
 		assertEquals(2, result.size());
 	}
 
@@ -68,8 +66,8 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(1, 30), "tasks");
 
-		assertEquals(ImmutableSet.of("1"), result.get("page[number]"));
-		assertEquals(ImmutableSet.of("30"), result.get("page[size]"));
+		assertEquals(Set.of("1"), result.get("page[number]"));
+		assertEquals(Set.of("30"), result.get("page[size]"));
 		assertEquals(2, result.size());
 	}
 
@@ -85,7 +83,7 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserializeDefaultWithOffset() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("2")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("2")));
 
 		assertEquals(new NumberSizePagingSpec(2, null), result);
 	}
@@ -94,7 +92,7 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserializeDefaultWithLimit() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -113,7 +111,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultNumber(1);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("1")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("1")));
 
 		assertEquals(new NumberSizePagingSpec(1, null), result);
 	}
@@ -123,7 +121,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultNumber(1);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -142,7 +140,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultLimit(30L);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("1")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("1")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -152,7 +150,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultLimit(30L);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("10")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("10")));
 
 		assertEquals(new NumberSizePagingSpec(1, 10), result);
 	}
@@ -161,8 +159,8 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserialize() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("2"),
-						"size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("2"),
+						"size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(2, 30), result);
 	}

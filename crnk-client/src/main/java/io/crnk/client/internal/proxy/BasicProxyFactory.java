@@ -65,7 +65,7 @@ public class BasicProxyFactory implements ClientProxyFactory {
             Collection lazyCollection = (Collection) constructor.newInstance(handler);
             boolean isCustomClass = WrappedList.class.isAssignableFrom(collectionClass);
             if (isCustomClass) {
-                WrappedList collectionImpl = (WrappedList) collectionClass.newInstance();
+                WrappedList collectionImpl = (WrappedList) collectionClass.getConstructor().newInstance();
                 collectionImpl.setWrappedList((List) lazyCollection);
                 return (C) collectionImpl;
             } else {

@@ -62,7 +62,7 @@ public class TSGenerator {
 			ExceptionUtil.wrapCatchedExceptions(new Callable<Object>() {
 				@Override
 				public Object call() throws Exception {
-					transformations.add((TSMetaTransformation) getClass().getClassLoader().loadClass(className).newInstance());
+					transformations.add((TSMetaTransformation) getClass().getClassLoader().loadClass(className).getConstructor().newInstance());
 					return null;
 				}
 			}, "failed to load transformation implementation {}", className);

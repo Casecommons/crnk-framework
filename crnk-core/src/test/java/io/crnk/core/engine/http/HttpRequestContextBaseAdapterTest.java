@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import io.crnk.core.engine.internal.http.HttpRequestContextBaseAdapter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -69,7 +68,7 @@ public class HttpRequestContextBaseAdapterTest {
     @Test
     public void testRequestVersionAsParameter() {
         Map<String, Set<String>> parameters = new HashMap<>();
-        parameters.put(HttpHeaders.VERSION_ACCEPT_PARAMETER, Sets.newHashSet("3"));
+        parameters.put(HttpHeaders.VERSION_ACCEPT_PARAMETER, Set.of("3"));
         Mockito.when(base.getRequestHeader(Mockito.eq(HttpHeaders.HTTP_HEADER_ACCEPT))).thenReturn("text/html,application/json");
         Mockito.when(base.getRequestParameters()).thenReturn(parameters);
 

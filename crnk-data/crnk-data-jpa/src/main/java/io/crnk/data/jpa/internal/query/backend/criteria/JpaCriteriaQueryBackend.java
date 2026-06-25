@@ -231,16 +231,24 @@ public class JpaCriteriaQueryBackend<T> implements JpaQueryBackend<From<?, ?>, O
 		}
 	}
 
+	private boolean isPluralPath(Expression<?> expression) {
+		if (expression instanceof Path) {
+			jakarta.persistence.metamodel.Bindable<?> model = ((Path<?>) expression).getModel();
+			return model instanceof jakarta.persistence.metamodel.PluralAttribute;
+		}
+		return Collection.class.isAssignableFrom(expression.getJavaType());
+	}
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private Predicate handleEquals(Expression<?> expression, FilterOperator operator, Object value) {
 		if (value instanceof List) {
 			Predicate p = expression.in(((List<?>) value).toArray());
 			return negateIfNeeded(p, operator);
-		} else if (Collection.class.isAssignableFrom(expression.getJavaType())) {
-			Predicate p = cb.literal(value).in(expression);
-			return negateIfNeeded(p, operator);
 		} else if (expression instanceof MapJoin) {
 			Predicate p = cb.literal(value).in(((MapJoin) expression).value());
+			return negateIfNeeded(p, operator);
+		} else if (isPluralPath(expression)) {
+			Predicate p = cb.isMember(value, (Expression<Collection>) expression);
 			return negateIfNeeded(p, operator);
 		} else if (value == null) {
 			return negateIfNeeded(cb.isNull(expression), operator);

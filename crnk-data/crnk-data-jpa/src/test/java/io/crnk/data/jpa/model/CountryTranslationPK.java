@@ -1,6 +1,6 @@
 package io.crnk.data.jpa.model;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
@@ -51,7 +51,7 @@ public class CountryTranslationPK implements Serializable {
 			return false;
 		}
 		CountryTranslationPK other = (CountryTranslationPK) obj;
-		return Objects.equal(other.lang, lang) && Objects.equal(other.country, country);
+		return Objects.equals(other.lang, lang) && Objects.equals(other.country, country);
 	}
 
 }

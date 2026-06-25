@@ -1,7 +1,7 @@
 package io.crnk.rs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.information.InformationBuilder;
 import io.crnk.core.engine.information.repository.RepositoryAction;
@@ -49,7 +49,7 @@ public class JaxrsModuleTest {
         builder = new JaxrsModule.JaxrsResourceRepositoryInformationProvider();
         final ResourceInformationProvider resourceInformationProvider = new DefaultResourceInformationProvider(
                 moduleRegistry.getPropertiesProvider(),
-                ImmutableList.<PagingBehavior>of(new OffsetLimitPagingBehavior()),
+                List.<PagingBehavior>of(new OffsetLimitPagingBehavior()),
                 new DefaultResourceFieldInformationProvider(),
                 new JacksonResourceFieldInformationProvider());
         resourceInformationProvider

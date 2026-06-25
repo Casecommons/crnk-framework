@@ -19,7 +19,7 @@ public class ForkedGeneratorMain {
         try {
             moduleClass = Class.forName(args[2]);
 
-            GeneratorModule module = (GeneratorModule) moduleClass.newInstance();
+            GeneratorModule module = (GeneratorModule) moduleClass.getConstructor().newInstance();
 
             ObjectMapper mapper = new ObjectMapper();
             GeneratorConfig config = mapper.readerFor(GeneratorConfig.class).readValue(configFile);
@@ -30,7 +30,7 @@ public class ForkedGeneratorMain {
             RuntimeContext context = new RuntimeContext(module, classLoader, config);
             metaResolverClassName = config.computeMetaResolverClassName();
 
-            RuntimeMetaResolver runtime = (RuntimeMetaResolver) Class.forName(metaResolverClassName).newInstance();
+            RuntimeMetaResolver runtime = (RuntimeMetaResolver) Class.forName(metaResolverClassName).getConstructor().newInstance();
             runtime.run(context, classLoader);
             System.exit(0);
         } catch (Throwable e) {
