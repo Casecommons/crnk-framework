@@ -31,8 +31,8 @@ dependencies {
 	api 'org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-jetty'
 	api 'org.glassfish.jersey.test-framework:jersey-test-framework-core'
 
-	api 'org.apache.httpcomponents:httpclient:4.5.2'
-	api 'com.squareup.okhttp3:okhttp:3.4.1'
+	api 'org.apache.httpcomponents.client5:httpclient5:5.4.1'
+	api 'com.squareup.okhttp3:okhttp:4.12.0'
 	api 'org.reflections:reflections'
 	api 'nl.jqno.equalsverifier:equalsverifier:3.16.1'
 }

@@ -11,13 +11,15 @@ import io.crnk.test.mock.models.Task;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
-import org.apache.http.Header;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.protocol.HttpContext;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.http.EntityDetails;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpRequest;
+import org.apache.hc.core5.http.HttpRequestInterceptor;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpResponseInterceptor;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -65,16 +67,16 @@ public class CharsetTest extends AbstractClientTest {
 			adapter.addListener(new HttpClientAdapterListener() {
 				@Override
 				public void onBuild(HttpClientBuilder builder) {
-					builder.addInterceptorFirst(new HttpRequestInterceptor() {
+					builder.addRequestInterceptorFirst(new HttpRequestInterceptor() {
 						@Override
-						public void process(HttpRequest httpRequest, HttpContext httpContext) {
+						public void process(HttpRequest httpRequest, EntityDetails entityDetails, HttpContext httpContext) throws HttpException, IOException {
 							Header header = httpRequest.getFirstHeader(HttpHeaders.HTTP_CONTENT_TYPE);
 							requestContentType = header != null ? header.getValue() : null;
 						}
 					});
-					builder.addInterceptorFirst(new HttpResponseInterceptor() {
+					builder.addResponseInterceptorFirst(new HttpResponseInterceptor() {
 						@Override
-						public void process(HttpResponse httpResponse, HttpContext httpContext) {
+						public void process(HttpResponse httpResponse, EntityDetails entityDetails, HttpContext httpContext) throws HttpException, IOException {
 							Header header = httpResponse.getFirstHeader(HttpHeaders.HTTP_CONTENT_TYPE);
 							responseContentType = header != null ? header.getValue() : null;
 						}

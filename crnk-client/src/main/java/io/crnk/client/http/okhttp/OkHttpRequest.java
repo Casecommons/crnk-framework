@@ -46,7 +46,7 @@ public class OkHttpRequest implements HttpAdapterRequest {
         builder = new Request.Builder().url(url);
 
 
-        RequestBody requestBodyObj = requestBody != null ? RequestBody.create(CONTENT_TYPE, requestBody) : null;
+        RequestBody requestBodyObj = requestBody != null ? RequestBody.create(requestBody, CONTENT_TYPE) : null;
         builder.method(method.toString(), requestBodyObj);
     }
 

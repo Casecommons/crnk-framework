@@ -29,7 +29,6 @@ import io.crnk.data.jpa.util.SpringTransactionRunner;
 import io.crnk.rs.type.JsonApiMediaType;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.apache.http.HttpStatus;
 import org.hamcrest.Matchers;
 
 import jakarta.persistence.EntityManager;
@@ -189,7 +188,7 @@ public class CustomResourceFieldTest extends AbstractJpaJerseyTest {
         Response patchResponse =
                 RestAssured.given().body(patchData.getBytes()).header("content-type", JsonApiMediaType.APPLICATION_JSON_API)
                         .when().patch(url);
-        patchResponse.then().statusCode(HttpStatus.SC_OK);
+        patchResponse.then().statusCode(200);
 
         getResponse = RestAssured.get(url);
         Assertions.assertEquals(200, getResponse.getStatusCode());

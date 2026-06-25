@@ -1,6 +1,6 @@
 package io.crnk.client.http.apache;
 
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
 public class HttpClientAdapterListenerBase implements HttpClientAdapterListener {
 

@@ -5,17 +5,18 @@ import io.crnk.client.http.HttpAdapterRequest;
 import io.crnk.client.http.HttpAdapterResponse;
 import io.crnk.core.engine.http.HttpHeaders;
 import io.crnk.core.engine.http.HttpMethod;
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.client5.http.classic.methods.HttpDelete;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPatch;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -30,7 +31,7 @@ public class HttpClientRequest implements HttpAdapterRequest {
 
     private final String requestBody;
 
-    private HttpRequestBase requestBase;
+    private HttpUriRequestBase requestBase;
 
     private CloseableHttpClient impl;
 
@@ -45,15 +46,14 @@ public class HttpClientRequest implements HttpAdapterRequest {
             post.setEntity(new StringEntity(requestBody, CONTENT_TYPE));
             requestBase = post;
         } else if (method == HttpMethod.PATCH) {
-            HttpPatch post = new HttpPatch(url);
-            post.setEntity(new StringEntity(requestBody, CONTENT_TYPE));
-            requestBase = post;
+            HttpPatch patch = new HttpPatch(url);
+            patch.setEntity(new StringEntity(requestBody, CONTENT_TYPE));
+            requestBase = patch;
         } else if (method == HttpMethod.DELETE) {
             requestBase = new HttpDelete(url);
         } else {
             throw new UnsupportedOperationException(method.toString());
         }
-
     }
 
     @Override
@@ -76,7 +76,11 @@ public class HttpClientRequest implements HttpAdapterRequest {
 
     @Override
     public String getUrl() {
-        return requestBase.getURI().toString();
+        try {
+            return requestBase.getUri().toString();
+        } catch (URISyntaxException e) {
+            return requestBase.getRequestUri();
+        }
     }
 
     @Override
@@ -86,7 +90,7 @@ public class HttpClientRequest implements HttpAdapterRequest {
 
     @Override
     public Set<String> getHeadersNames() {
-        return Arrays.asList(requestBase.getAllHeaders())
+        return Arrays.asList(requestBase.getHeaders())
                 .stream()
                 .map(it -> it.getName())
                 .collect(Collectors.toSet());
