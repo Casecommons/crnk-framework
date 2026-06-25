@@ -1,12 +1,16 @@
 // tag::versions[]
 buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
 	dependencies {
 		apply from: "versions.gradle"
 
 		def depMgmtVersion = versions['dependency.management.plugin.version']
 
 		classpath "io.spring.gradle:dependency-management-plugin:${depMgmtVersion}"
-		classpath 'org.asciidoctor:asciidoctor-gradle-jvm:3.3.2'
+		classpath 'org.asciidoctor:asciidoctor-gradle-jvm:4.0.3'
 		classpath 'com.moowork.gradle:gradle-node-plugin:1.1.1'
 		classpath 'org.ajoberstar.git-publish:gradle-git-publish:3.0.1'
 		classpath 'org.ajoberstar.grgit:grgit-gradle:4.1.1'
@@ -14,7 +18,7 @@ buildscript {
 		classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
 
 		classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
-		classpath 'com.vanniktech:gradle-maven-publish-plugin:0.15.1'
+		classpath 'com.vanniktech:gradle-maven-publish-plugin:0.28.0'
 	}
 }
 
@@ -22,8 +26,8 @@ import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 
 
-wrapper {
-	gradleVersion = '8.13'
+tasks.named('wrapper') {
+	gradleVersion = '9.0'
 }
 
 // note that a production build creates javadoc, sources jars and signatures undesired during development
@@ -90,6 +94,7 @@ gradle.beforeProject { Project project ->
 					testImplementation group: 'junit', name: 'junit', version: '4.12'
 					testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
 					testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+					testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 					// Jakarta EE: common annotations (@PostConstruct, @Generated, @Priority, ...)
 					api group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.1'
 					// Jakarta XML Binding (JAXB) API
@@ -125,7 +130,7 @@ gradle.beforeProject { Project project ->
 
 					// Gradle 8: pre-create binary output dir to avoid FileNotFoundException in report generation
 					doFirst {
-						new File(project.buildDir, 'test-results/test/binary').mkdirs()
+						project.layout.buildDirectory.dir('test-results/test/binary').get().asFile.mkdirs()
 					}
 				}
 
@@ -153,17 +158,8 @@ gradle.beforeProject { Project project ->
 
 						dependency 'org.reflections:reflections:0.10.2'
 
-						// The Spring Boot 4 BOM pulls JUnit 6.0 / JUnit Platform 6.0, whose engine
-						// is incompatible with the JUnit Platform 1.x launcher bundled by Gradle 8.13
-						// (test workers fail to start). Pin back to the JUnit 5.11 / Platform 1.11 line.
-						dependency 'org.junit.jupiter:junit-jupiter:5.11.4'
-						dependency 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-						dependency 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
-						dependency 'org.junit.jupiter:junit-jupiter-params:5.11.4'
-						dependency 'org.junit.vintage:junit-vintage-engine:5.11.4'
-						dependency 'org.junit.platform:junit-platform-commons:1.11.4'
-						dependency 'org.junit.platform:junit-platform-engine:1.11.4'
-						dependency 'org.junit.platform:junit-platform-launcher:1.11.4'
+						// JUnit versions managed by the Spring Boot 4 BOM (JUnit 6.x / Platform 2.x).
+						// Gradle 9 bundles a compatible JUnit Platform launcher.
 					}
 				}
 			}
@@ -204,7 +200,7 @@ gradle.beforeProject { Project project ->
 			}
 
 			task javadocJar(type: Jar, dependsOn: 'javadoc') {
-				from javadoc.destinationDir
+				from tasks.named('javadoc').map { it.destinationDir }
 				archiveClassifier = 'javadoc'
 			}
 
@@ -307,7 +303,7 @@ task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 
 
 coveralls {
-	jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+	jacocoReportPath = layout.buildDirectory.file('reports/jacoco/jacocoRootReport/jacocoRootReport.xml').get().asFile.path
 }
 
 tasks.coveralls {

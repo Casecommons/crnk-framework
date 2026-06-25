@@ -2,7 +2,9 @@ apply plugin: 'java'
 
 apply plugin: 'application'
 
-mainClassName = "io.crnk.example.dropwizard.simple.DropwizardService"
+application {
+    mainClass.set("io.crnk.example.dropwizard.simple.DropwizardService")
+}
 
 dependencies {
 	implementation project(':crnk-setup:crnk-setup-rs')

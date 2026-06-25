@@ -26,13 +26,13 @@ gitPublish {
 
 	repoUri = 'https://github.com/crnk-project/crnk-web.git'
 	branch = 'master'
-	repoDir = file("$buildDir/website/")
+	repoDir = layout.buildDirectory.dir('website').get().asFile
 
 	contents {
-		from("${project.buildDir}/asciidoc/html5") {
+		from(layout.buildDirectory.dir('asciidoc/html5')) {
 			into('releases/latest/documentation')
 		}
-		from("${project.buildDir}/asciidoc/pdf") {
+		from(layout.buildDirectory.dir('asciidoc/pdf')) {
 			into('releases/latest')
 			include "**.pdf"
 
@@ -62,7 +62,7 @@ gitPublishCopy.doLast {
 	def templateFile = file('src/docs/template/release.html')
 
 	def releasesSrcDir = file("${project.projectDir}/src/docs/releases")
-	def releasesWebDir = file("$project.buildDir/website/releases")
+	def releasesWebDir = layout.buildDirectory.dir('website/releases').get().asFile
 	def latestReleaseDir = file("${releasesSrcDir}/latest")
 
 	if (!latestReleaseDir.isDirectory()) {
@@ -125,23 +125,23 @@ gitPublishCopy.doLast {
 
 task promote(type: Copy) {
 	group = 'publishing'
-	from("${project.buildDir}/website/releases/latest") {
+	from(layout.buildDirectory.dir('website/releases/latest')) {
 		into("v$BUILD_VERSION_PREFIX")
 	}
 
-	from("${project.buildDir}/website/releases/latest") {
+	from(layout.buildDirectory.dir('website/releases/latest')) {
 		into("stable")
 	}
-	into("${project.buildDir}/website/releases")
+	into(layout.buildDirectory.dir('website/releases'))
 
 	doLast {
-		def latestSrc = file("${project.buildDir}/website/releases/latest/index.html")
+		def latestSrc = layout.buildDirectory.file('website/releases/latest/index.html').get().asFile
 
-		def versionSrc = file("${project.buildDir}/website/releases/v$BUILD_VERSION_PREFIX/index.html")
+		def versionSrc = layout.buildDirectory.file("website/releases/v$BUILD_VERSION_PREFIX/index.html").get().asFile
 		versionSrc.parentFile.mkdirs()
 		versionSrc.text = latestSrc.text.replace("<h3>Latest</h3>", "<h3>${project.version}</h3>")
 
-		def stableSrc = file("${project.buildDir}/website/releases/stable/index.html")
+		def stableSrc = layout.buildDirectory.file('website/releases/stable/index.html').get().asFile
 		stableSrc.parentFile.mkdirs()
 		stableSrc.text = latestSrc.text.replace("<h3>Latest</h3>", "<h3>${project.version}</h3>")
 	}

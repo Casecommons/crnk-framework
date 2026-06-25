@@ -6,9 +6,12 @@ import io.crnk.gen.base.GeneratorModule;
 import io.crnk.gen.gradle.internal.RuntimeClassLoaderFactory;
 import org.gradle.api.Project;
 import org.gradle.api.file.ConfigurableFileCollection;
+import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
+
+import javax.inject.Inject;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +22,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ForkedGenerateTask extends JavaExec implements GeneratorTaskContract {
+public abstract class ForkedGenerateTask extends JavaExec implements GeneratorTaskContract {
 
     private GeneratorModule module;
 
     public ForkedGenerateTask() {
         setGroup("generation");
         setDescription("generate Typescript stubs from a Crnk setup");
-        setMain(ForkedGeneratorMain.class.getName());
+        getMainClass().set(ForkedGeneratorMain.class.getName());
     }
 
     @TaskAction
@@ -37,8 +40,8 @@ public class ForkedGenerateTask extends JavaExec implements GeneratorTaskContrac
     }
 
     private void initConfigFile() {
-        File mainFile = new File(getProject().getBuildDir(), "crnk.gen.config.main.json");
-        File moduleFile = new File(getProject().getBuildDir(), "crnk.gen.config.module.json");
+        File mainFile = new File(getProject().getLayout().getBuildDirectory().get().getAsFile(), "crnk.gen.config.main.json");
+        File moduleFile = new File(getProject().getLayout().getBuildDirectory().get().getAsFile(), "crnk.gen.config.module.json");
         moduleFile.getParentFile().mkdirs();
 
         GeneratorConfig config = getConfig();
