@@ -6,7 +6,7 @@ mainClassName = "io.crnk.example.springboot.microservice.MicroServiceApplication
 
 dependencies {
 
-	implementation project(':crnk-setup:crnk-setup-spring-boot2')
+	implementation project(':crnk-setup:crnk-setup-spring-boot4')
 	implementation project(':crnk-home')
 	implementation project(':crnk-testkit')
 	implementation project(':crnk-client')

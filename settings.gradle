@@ -18,7 +18,7 @@ include ':crnk-security'
 include ':crnk-ui'
 
 include ':crnk-setup:crnk-setup-spring'
-include ':crnk-setup:crnk-setup-spring-boot2'
+include ':crnk-setup:crnk-setup-spring-boot4'
 include ':crnk-setup:crnk-setup-vertx'
 include ':crnk-setup:crnk-setup-servlet'
 include ':crnk-setup:crnk-setup-cdi'
@@ -87,5 +87,3 @@ gradle.beforeProject { Project project ->
         group = rootProject.group
     }
 }
-
-
