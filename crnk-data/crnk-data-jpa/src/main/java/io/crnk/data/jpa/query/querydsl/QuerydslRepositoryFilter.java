@@ -11,7 +11,6 @@ public interface QuerydslRepositoryFilter extends JpaRepositoryFilter {
 	 * @param repository         invoked
 	 * @param querySpec          provided by caller
 	 * @param translationContext to modify the translation
-	 * @return filtered query
 	 */
 	<T> void filterQueryTranslation(Object repository, QuerySpec querySpec,
 									QuerydslTranslationContext<T> translationContext);
