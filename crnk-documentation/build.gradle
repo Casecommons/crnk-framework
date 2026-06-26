@@ -126,7 +126,7 @@ gitPublishCopy.doLast {
 task promote(type: Copy) {
 	group = 'publishing'
 	from(layout.buildDirectory.dir('website/releases/latest')) {
-		into("v$BUILD_VERSION_PREFIX")
+		into("v$BUILD_VERSION")
 	}
 
 	from(layout.buildDirectory.dir('website/releases/latest')) {
@@ -137,7 +137,7 @@ task promote(type: Copy) {
 	doLast {
 		def latestSrc = layout.buildDirectory.file('website/releases/latest/index.html').get().asFile
 
-		def versionSrc = layout.buildDirectory.file("website/releases/v$BUILD_VERSION_PREFIX/index.html").get().asFile
+		def versionSrc = layout.buildDirectory.file("website/releases/v$BUILD_VERSION/index.html").get().asFile
 		versionSrc.parentFile.mkdirs()
 		versionSrc.text = latestSrc.text.replace("<h3>Latest</h3>", "<h3>${project.version}</h3>")
 

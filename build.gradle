@@ -13,37 +13,16 @@ buildscript {
 		classpath 'org.asciidoctor:asciidoctor-gradle-jvm:4.0.3'
 		classpath 'com.moowork.gradle:gradle-node-plugin:1.1.1'
 		classpath 'org.ajoberstar.git-publish:gradle-git-publish:3.0.1'
-		classpath 'org.ajoberstar.grgit:grgit-gradle:4.1.1'
-		// classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5-rc1'
 		classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
-
 		classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
-		classpath 'com.vanniktech:gradle-maven-publish-plugin:0.28.0'
 	}
 }
-
-import com.vanniktech.maven.publish.JavaLibrary
-import com.vanniktech.maven.publish.JavadocJar
-
 
 tasks.named('wrapper') {
 	gradleVersion = '9.0'
 }
 
-// note that a production build creates javadoc, sources jars and signatures undesired during development
-// for performance reasons
-def isProductionBuild = project.hasProperty('mavenCentralUsername')
-ext {
-	timestampedVersion = isProductionBuild
-}
-
-apply plugin: 'org.ajoberstar.grgit'
-if (ext.timestampedVersion) {
-	def gitCommitTimestamp = grgit.head().date.format("yyyyMMddHHmmss", TimeZone.getTimeZone('GMT'))
-	version = BUILD_VERSION_PREFIX + "." + gitCommitTimestamp
-} else {
-	version = '10.0.0-SNAPSHOT'
-}
+version = BUILD_VERSION
 group = GROUP_ID
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -147,13 +126,13 @@ gradle.beforeProject { Project project ->
 						mavenBom 'org.glassfish.jersey:jersey-bom:3.1.9'
 					}
 					dependencies {
-						dependency 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
-						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.20'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0'
-						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:2.20.0'
-						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-base:2.20.0'
-						dependency 'com.fasterxml.jackson.core:jackson-core:2.20.0'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0'
+						dependency 'com.fasterxml.jackson.core:jackson-databind:2.22.0'
+						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.22'
+						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.0'
+						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:2.22.0'
+						dependency 'com.fasterxml.jackson.jakarta.rs:jackson-jakarta-rs-base:2.22.0'
+						dependency 'com.fasterxml.jackson.core:jackson-core:2.22.0'
+						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.22.0'
 
 						dependency 'org.reflections:reflections:0.10.2'
 
@@ -191,80 +170,60 @@ gradle.beforeProject { Project project ->
 
 		apply plugin: 'maven-publish'
 
-		if (!docs && !examples) {
-
-			task sourcesJar(type: Jar) {
-				from sourceSets.main.allSource
-				archiveClassifier = 'sources'
-			}
-
-			task javadocJar(type: Jar, dependsOn: 'javadoc') {
-				from tasks.named('javadoc').map { it.destinationDir }
-				archiveClassifier = 'javadoc'
-			}
-
-
-			plugins.withId("com.vanniktech.maven.publish.base") {
-				group = GROUP_ID
-
-				mavenPublishing {
-					publishToMavenCentral("DEFAULT")
-
-					// Will only apply to non snapshot builds.
-					// Uses credentials as described above, supports both regular and in memory signing.
-					signAllPublications()
-
-					pom {
-						name = "Crnk"
-						description = "A description of what my library does."
-						inceptionYear = "2020"
-						url = "https ://github.com/crnk-project/crnk-framework/"
-						licenses {
-							license {
-								name = "The Apache License, Version 2.0"
-								url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-								distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-							}
-						}
-						developers {
-							developer {
-								id = "crnk"
-								name = "crnk"
-								url = "https://github.com/crnk-project/"
-							}
-						}
-						scm {
-							url = "https://github.com/crnk-project/crnk-framework"
-							connection = "scm:git:git://github.com/crnk-project/crnk-framework.git"
-							developerConnection = "scm:git:ssh://git@github.com/crnk-project/crnk-framework.git"
+		if (findProperty('artifactoryUrl')) {
+			publishing {
+				repositories {
+					maven {
+						url = findProperty('artifactoryUrl')
+						credentials {
+							username = findProperty('artifactoryUser') ?: ''
+							password = findProperty('artifactoryPassword') ?: ''
 						}
 					}
 				}
 			}
+		}
 
-			apply plugin: "com.vanniktech.maven.publish.base"
+		if (!docs && !examples) {
 
-			mavenPublishing {
-				// available options:
-				//   - JavaLibrary
-				//   - GradlePlugin
-				//   - AndroidLibrary
-				//   - KotlinJvm
-				//   - KotlinJs
-				//   - KotlinMultiplatform
-				// the first parameter configures the javadoc jar, available options:
-				//   - None
-				//   - Empty
-				//   - Javadoc
-				//   - Dokka("dokkaHtml") - the parameter is the name of the Dokka task
-				// second one is for whether to publish sources, optional, defaults to true (not supported for KotlinMultiplatform(
-				// AndroidLibrary has a third parameter for which variant to publish, defaults to "release"
-				configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
+			java {
+				withSourcesJar()
+				withJavadocJar()
 			}
 
+			publishing {
+				publications {
+					maven(MavenPublication) {
+						from components.java
+						groupId = GROUP_ID
 
-			def releaseBuild = project.hasProperty('stable')
-
+						pom {
+							name = "Crnk"
+							description = "JSON:API framework for Java"
+							inceptionYear = "2020"
+							url = "https://github.com/crnk-project/crnk-framework/"
+							licenses {
+								license {
+									name = "The Apache License, Version 2.0"
+									url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+								}
+							}
+							developers {
+								developer {
+									id = "crnk"
+									name = "crnk"
+									url = "https://github.com/crnk-project/"
+								}
+							}
+							scm {
+								url = "https://github.com/crnk-project/crnk-framework"
+								connection = "scm:git:git://github.com/crnk-project/crnk-framework.git"
+								developerConnection = "scm:git:ssh://git@github.com/crnk-project/crnk-framework.git"
+							}
+						}
+					}
+				}
+			}
 
 		}
 
