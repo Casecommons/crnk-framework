@@ -1,12 +1,13 @@
 package io.crnk.core.resource.meta;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
 import io.crnk.core.engine.internal.utils.CastableInformation;
 import io.crnk.core.engine.internal.utils.ClassUtils;
 
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -38,9 +39,11 @@ public class JsonMetaInformation implements MetaInformation, CastableInformation
 			if (metaClass.isInterface()) {
 				return createInterfaceJsonAdapter(metaClass, data, mapper);
 			}
-			return mapper.readerFor(metaClass).readValue(data);
+			return mapper.readerFor(metaClass)
+					.with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+					.readValue(data);
 		}
-		catch (IOException e) {
+		catch (JacksonException e) {
 			throw new IllegalStateException(e);
 		}
 	}

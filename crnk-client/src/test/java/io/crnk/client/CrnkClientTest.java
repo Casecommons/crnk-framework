@@ -1,6 +1,6 @@
 package io.crnk.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.queryspec.pagingspec.NumberSizePagingBehavior;
 import io.crnk.core.repository.ResourceRepository;

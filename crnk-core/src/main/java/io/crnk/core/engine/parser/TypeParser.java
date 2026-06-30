@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.internal.utils.MethodCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -226,23 +226,14 @@ public class TypeParser {
 			return new EnumStringMapper<>(clazz);
 		}
 
-		if (enforceJackson) {
-			return new JacksonStringMapper(objectMapper, clazz);
+		// Check for static parse(String) / parse(CharSequence) factory methods first,
+		// as Jackson 3 no longer auto-detects these as deserializer factory methods.
+		Optional<Method> method = methodCache.find(clazz, "parse", String.class);
+		if (!method.isPresent()) {
+			method = methodCache.find(clazz, "parse", CharSequence.class);
 		}
-
-		if (useJackson && input != null) {
-			try {
-				JacksonStringMapper parser = new JacksonStringMapper(objectMapper, clazz);
-				parser.parse(input);
-				return parser;
-			}
-			catch (RuntimeException e) {
-				if (enforceJackson) {
-					throw new ParserException(String.format("Cannot parse '%s' tp type=%s"));
-				}
-				LOGGER.debug("Jackson not applicable to {} based on input {}", clazz, input);
-				LOGGER.trace("Jackson error", e);
-			}
+		if (method.isPresent()) {
+			return new MethodBasedMapper(method.get(), clazz);
 		}
 
 		try {
@@ -255,12 +246,20 @@ public class TypeParser {
 			throw new IllegalStateException(e);
 		}
 
-		Optional<Method> method = methodCache.find(clazz, "parse", String.class);
-		if (!method.isPresent()) {
-			method = methodCache.find(clazz, "parse", CharSequence.class);
+		if (enforceJackson) {
+			return new JacksonStringMapper(objectMapper, clazz);
 		}
-		if (method.isPresent()) {
-			return new MethodBasedMapper(method.get(), clazz);
+
+		if (useJackson && input != null) {
+			try {
+				JacksonStringMapper parser = new JacksonStringMapper(objectMapper, clazz);
+				parser.parse(input);
+				return parser;
+			}
+			catch (RuntimeException e) {
+				LOGGER.debug("Jackson not applicable to {} based on input {}", clazz, input);
+				LOGGER.trace("Jackson error", e);
+			}
 		}
 
 		return null;

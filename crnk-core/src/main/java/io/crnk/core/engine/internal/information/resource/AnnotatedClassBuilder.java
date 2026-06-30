@@ -1,9 +1,9 @@
 package io.crnk.core.engine.internal.information.resource;
 
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import tools.jackson.databind.AnnotationIntrospector;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.introspect.AnnotatedClass;
 import io.crnk.core.engine.internal.utils.ExceptionUtil;
 import io.crnk.core.engine.internal.utils.PreconditionUtil;
 
@@ -55,7 +55,7 @@ public class AnnotatedClassBuilder {
 	private static AnnotatedClass buildViaResolver(final Class<?> declaringClass, final SerializationConfig serializationConfig) {
 		final Class<?> resolverClass;
 		try {
-			resolverClass = Class.forName("com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver");
+			resolverClass = Class.forName("tools.jackson.databind.introspect.AnnotatedClassResolver");
 		} catch (ClassNotFoundException e) {
 			return null;
 		}
@@ -64,9 +64,9 @@ public class AnnotatedClassBuilder {
 			public AnnotatedClass call() throws Exception {
 				JavaType declaringType = serializationConfig.constructType(declaringClass);
 				Method resolve = resolverClass.getMethod("resolve",
-						com.fasterxml.jackson.databind.cfg.MapperConfig.class,
+						tools.jackson.databind.cfg.MapperConfig.class,
 						JavaType.class,
-						com.fasterxml.jackson.databind.introspect.ClassIntrospector.MixInResolver.class);
+						tools.jackson.databind.introspect.MixInResolver.class);
 				return (AnnotatedClass) resolve.invoke(null, serializationConfig, declaringType, serializationConfig);
 			}
 		}, "Exception while building AnnotatedClass via AnnotatedClassResolver");

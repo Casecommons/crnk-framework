@@ -5,7 +5,6 @@ import org.junit.jupiter.api.AfterEach;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.crnk.client.CrnkClient;
 import io.crnk.client.http.okhttp.OkHttpAdapter;
 import io.crnk.client.http.okhttp.OkHttpAdapterListenerBase;
@@ -63,7 +62,7 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
     @BeforeEach
     public void setup() {
         client = new CrnkClient(getBaseUri().toString());
-        client.getObjectMapper().registerModule(new JavaTimeModule());
+        client.getObjectMapper();
 
         JpaModule module = JpaModule.newClientModule();
         client.addModule(module);
@@ -148,7 +147,7 @@ public abstract class AbstractJpaJerseyTest extends JerseyTestBase {
             metaConfig.addMetaProvider(jpaMetaProvider);
             metaModule = MetaModule.createServerModule(metaConfig);
             feature.addModule(metaModule);
-            feature.getObjectMapper().registerModule(new JavaTimeModule());
+            feature.getObjectMapper();
 
             setupFeature(feature);
 

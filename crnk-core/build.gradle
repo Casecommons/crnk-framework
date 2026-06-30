@@ -3,11 +3,12 @@ apply plugin: 'java'
 dependencies {
     api 'net.jodah:typetools:0.6.3'
     api 'org.slf4j:slf4j-api:2.0.16'
-    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'tools.jackson.core:jackson-databind'
     api 'com.fasterxml.jackson.core:jackson-annotations'
 
     testImplementation 'org.reflections:reflections'
     testImplementation 'net.javacrumbs.json-unit:json-unit-fluent:1.5.3'
+    testRuntimeOnly 'com.fasterxml.jackson.core:jackson-databind:2.22.0'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.1'
     testImplementation 'com.jayway.jsonpath:json-path:2.10.0'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.16.1'
@@ -20,6 +21,5 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.14.2'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.14.2'
     testImplementation 'org.assertj:assertj-core:3.27.7'
-    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
-	testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
+    // jackson-datatype-jsr310 and jackson-datatype-jdk8 are built into jackson-databind 3.x
 }

@@ -1,6 +1,6 @@
 package io.crnk.core.engine.document;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.internal.jackson.JacksonModule;
 import io.crnk.core.utils.Nullable;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -17,12 +17,12 @@ public class RelationshipTest {
 	@Test
 	public void testResourceEqualsContract() {
 		EqualsVerifier.forClass(Relationship.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
-				.withPrefabValues(com.fasterxml.jackson.databind.node.ObjectNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
-				.withPrefabValues(com.fasterxml.jackson.databind.JsonNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.node.ObjectNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.JsonNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
 				.verify();
 	}
 
@@ -65,8 +65,9 @@ public class RelationshipTest {
 
 
 	private void checkSerialize(Relationship relationship) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(JacksonModule.createJacksonModule());
+		ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.addModule(JacksonModule.createJacksonModule())
+				.build();
 		String json = mapper.writeValueAsString(relationship);
 		Relationship copy = mapper.readerFor(Relationship.class).readValue(json);
 		Assertions.assertEquals(relationship, copy);

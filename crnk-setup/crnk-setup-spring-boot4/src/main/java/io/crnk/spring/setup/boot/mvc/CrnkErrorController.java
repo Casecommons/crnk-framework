@@ -1,6 +1,6 @@
 package io.crnk.spring.setup.boot.mvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.ErrorDataBuilder;
@@ -48,9 +48,9 @@ public class CrnkErrorController extends BasicErrorController {
 	}
 
 	private static ObjectMapper createObjectMapper() {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(JacksonModule.createJacksonModule());
-		return mapper;
+		return tools.jackson.databind.json.JsonMapper.builder()
+				.addModule(JacksonModule.createJacksonModule())
+				.build();
 	}
 
 	// TODO for whatever reason this is not called directly
@@ -85,7 +85,7 @@ public class CrnkErrorController extends BasicErrorController {
 			return ResponseEntity.status(status)
 					.contentType(MediaType.parseMediaType(HttpHeaders.JSONAPI_CONTENT_TYPE))
 					.body(json);
-		} catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+		} catch (tools.jackson.core.JacksonException e) {
 			throw new IllegalStateException("failed to serialize error document", e);
 		}
 	}

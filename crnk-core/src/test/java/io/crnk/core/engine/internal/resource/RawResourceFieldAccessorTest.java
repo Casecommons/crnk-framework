@@ -1,6 +1,6 @@
 package io.crnk.core.engine.internal.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.document.Resource;
 import io.crnk.core.engine.document.ResourceIdentifier;
 import io.crnk.core.engine.information.resource.ResourceFieldType;

@@ -1,11 +1,11 @@
 package io.crnk.core.engine.internal.information.resource;
 
-import java.io.IOException;
+import tools.jackson.core.JacksonException;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
 import io.crnk.core.engine.document.Relationship;
 import io.crnk.core.engine.document.Resource;
 import io.crnk.core.engine.information.resource.ResourceFieldType;
@@ -59,7 +59,7 @@ public class RawResourceFieldAccessor implements io.crnk.core.engine.information
 				return null;
 			}
 			return reader.readValue(node);
-		} catch (IOException e) {
+		} catch (JacksonException e) {
 			throw new IllegalStateException(e);
 		}
 	}

@@ -1,9 +1,9 @@
 package io.crnk.core.engine.document;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.utils.Nullable;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
@@ -20,11 +20,11 @@ public class DocumentTest {
 	public void testDocumentEqualsContract() {
 		EqualsVerifier.forClass(Document.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
 				.withPrefabValues(ObjectNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
-				.withPrefabValues(com.fasterxml.jackson.databind.JsonNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.JsonNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
 				.withIgnoredFields("jsonapi")
 				.verify();
 	}
@@ -48,11 +48,11 @@ public class DocumentTest {
 	}
 
 	@Test
-	public void checkJsonApiServerInfoNotSerializedIfNull() throws JsonProcessingException {
+	public void checkJsonApiServerInfoNotSerializedIfNull() {
 		Document document = new Document();
 		document.setJsonapi(null);
 		Assertions.assertNull(document.getJsonapi());
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = JsonMapper.builder().build();
 		ObjectWriter writer = objectMapper.writerFor(Document.class);
 		String json = writer.writeValueAsString(document);
 		Assertions.assertEquals("{}", json);
@@ -60,7 +60,7 @@ public class DocumentTest {
 
 	@Test
 	public void checkJsonApiServerInfoSerialized() throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
+		ObjectMapper objectMapper = JsonMapper.builder().build();
 		ObjectWriter writer = objectMapper.writerFor(Document.class);
 
 		ObjectNode info = (ObjectNode) objectMapper.readTree("{\"a\" : \"b\"}");

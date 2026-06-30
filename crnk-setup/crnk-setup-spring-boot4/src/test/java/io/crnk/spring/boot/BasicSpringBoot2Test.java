@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import jakarta.security.auth.message.config.AuthConfigFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.client.CrnkClient;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.document.Document;
@@ -304,8 +304,9 @@ public class BasicSpringBoot2Test {
 			assertEquals(HttpStatus.NOT_FOUND, e.getStatusCode());
 
 			String body = e.getResponseBodyAsString();
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.registerModule(JacksonModule.createJacksonModule());
+			ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder()
+					.addModule(JacksonModule.createJacksonModule())
+					.build();
 			Document document = mapper.readerFor(Document.class).readValue(body);
 
 			Assertions.assertEquals(1, document.getErrors().size());

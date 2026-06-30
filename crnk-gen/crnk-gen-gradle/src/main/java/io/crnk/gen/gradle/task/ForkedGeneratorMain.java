@@ -1,6 +1,6 @@
 package io.crnk.gen.gradle.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.gen.base.GeneratorConfig;
 import io.crnk.gen.base.GeneratorModule;
 import io.crnk.gen.base.GeneratorModuleConfigBase;

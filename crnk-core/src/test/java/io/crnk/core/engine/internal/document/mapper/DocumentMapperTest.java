@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.Relationship;
@@ -187,7 +185,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 
 	@Test
-	public void testJsonIncludeNonEmptyOnId() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyOnId() throws Exception {
 		Project project = new Project();
 		project.setName("someProject");
 
@@ -209,7 +207,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 	}
 
 	@Test
-	public void testJsonIncludeNonEmptyIgnoresNull() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyIgnoresNull() throws Exception {
 		// note that desc and followup project make use of @JsonInclude.Include.NON_EMPTY
 		Schedule schedule = new Schedule();
 		schedule.setDesc(null);
@@ -228,7 +226,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 
 	@Test
-	public void testJsonIncludeNonEmptyIgnoresEmptyList() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyIgnoresEmptyList() throws Exception {
 		// makes use of @JsonInclude.Include.NON_EMPTY
 		Schedule schedule = new Schedule();
 		schedule.setKeywords(Collections.emptyList());
@@ -246,7 +244,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 	}
 
 	@Test
-	public void testJsonIncludeNonEmptyWritesNonEmpty() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyWritesNonEmpty() throws Exception {
 		Project project = new Project();
 		project.setId(12L);
 

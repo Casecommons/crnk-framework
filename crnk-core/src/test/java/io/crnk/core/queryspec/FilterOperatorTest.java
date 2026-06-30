@@ -2,7 +2,7 @@ package io.crnk.core.queryspec;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.exception.BadRequestException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

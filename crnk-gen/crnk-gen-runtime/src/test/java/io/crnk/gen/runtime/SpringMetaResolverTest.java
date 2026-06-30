@@ -1,6 +1,6 @@
 package io.crnk.gen.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.gen.base.GeneratorConfig;
 import io.crnk.gen.runtime.spring.SpringMetaResolver;
 import io.crnk.meta.MetaLookup;

@@ -1,7 +1,5 @@
 package io.crnk.meta.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import io.crnk.client.CrnkClient;
 import io.crnk.client.http.okhttp.OkHttpAdapter;
 import io.crnk.client.http.okhttp.OkHttpAdapterListenerBase;
@@ -61,8 +59,6 @@ public abstract class AbstractMetaJerseyTest extends JerseyTestBase {
 
         public TestApplication() {
             CrnkFeature feature = new CrnkFeature();
-            ObjectMapper objectMapper = feature.getObjectMapper();
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             feature.addModule(createModule());
             feature.addModule(new TestModule());
             boot = feature.getBoot();

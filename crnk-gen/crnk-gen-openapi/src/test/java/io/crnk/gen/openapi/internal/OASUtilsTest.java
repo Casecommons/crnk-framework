@@ -145,7 +145,8 @@ public class OASUtilsTest {
     MetaPrimitiveType type = new MetaPrimitiveType();
     type.setName("date");
     Schema schema = OASUtils.transformMetaResourceField(type);
-    Assertions.assertTrue(schema instanceof DateSchema);
+    // java.util.Date represents a date-time, not just a date
+    Assertions.assertTrue(schema instanceof DateTimeSchema);
   }
 
   @Test

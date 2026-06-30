@@ -3,7 +3,7 @@ package io.crnk.core.resource;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.information.resource.EmbeddableInformation;
 import io.crnk.core.engine.information.resource.ResourceField;

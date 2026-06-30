@@ -17,8 +17,9 @@ import io.crnk.test.mock.repository.ProjectToTaskRepository;
 import io.crnk.test.mock.repository.ScheduleRepositoryImpl;
 import io.crnk.test.mock.repository.TaskRepository;
 import io.crnk.test.mock.repository.TaskToProjectRepository;
-import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ResourceConfig;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -46,7 +47,7 @@ public abstract class AbstractClientTest extends JerseyTestBase {
 		client.setActionStubFactory(JerseyActionStubFactory.newInstance());
 		// end::jerseyStubFactory[]
 		client.getHttpAdapter().setReceiveTimeout(10000000, TimeUnit.MILLISECONDS);
-		client.getObjectMapper().findAndRegisterModules();
+		// modules are auto-discovered in Jackson 3
 	}
 
 	protected void setupClient(CrnkClient client) {
@@ -117,18 +118,22 @@ public abstract class AbstractClientTest extends JerseyTestBase {
 		}
 
 		public TestApplication(boolean jsonApiFilter, boolean serializeLinksAsObjects) {
+			// Disable Jersey's auto-discovery of jackson-media-json-jackson (Jackson 2)
+			property(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
 			property(CrnkProperties.SERIALIZE_LINKS_AS_OBJECTS, Boolean.toString(serializeLinksAsObjects));
 
 			feature = new CrnkTestFeature();
-			feature.getObjectMapper().findAndRegisterModules();
+			// modules are auto-discovered in Jackson 3
 
 			feature.addModule(new io.crnk.test.mock.TestModule());
 			feature.addModule(new ClientTestModule());
 
+			// Register Jackson 3 JAX-RS provider
+			register(new JacksonJsonProvider());
+
 			if (jsonApiFilter) {
 				register(new JsonApiResponseFilter(feature));
 				register(new JsonapiExceptionMapperBridge(feature));
-				register(new JacksonFeature());
 			}
 
 			setupFeature(feature);

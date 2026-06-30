@@ -1,6 +1,6 @@
 package io.crnk.core.module;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.dispatcher.Response;
 import io.crnk.core.engine.error.ExceptionMapper;
 import io.crnk.core.engine.filter.DocumentFilter;
@@ -408,10 +408,10 @@ public class ModuleRegistryTest {
 
     @Test
     public void testJacksonModule() {
-        List<com.fasterxml.jackson.databind.Module> jacksonModules = moduleRegistry.getJacksonModules();
-        Assertions.assertEquals(1, jacksonModules.size());
-        com.fasterxml.jackson.databind.Module jacksonModule = jacksonModules.get(0);
-        Assertions.assertEquals("test", jacksonModule.getModuleName());
+        List<tools.jackson.databind.JacksonModule> jacksonModules = moduleRegistry.getJacksonModules();
+        Assertions.assertEquals(2, jacksonModules.size());
+        Assertions.assertTrue(jacksonModules.stream().anyMatch(m -> "test".equals(m.getModuleName())));
+        Assertions.assertTrue(jacksonModules.stream().anyMatch(m -> "crnk".equals(m.getModuleName())));
     }
 
     @Test
@@ -568,7 +568,7 @@ public class ModuleRegistryTest {
             context.addResourceLookup(new TestResourceLookup());
             context.addResourceInformationProvider(new TestResourceInformationProvider());
 
-            context.addJacksonModule(new com.fasterxml.jackson.databind.module.SimpleModule() {
+            context.addJacksonModule(new tools.jackson.databind.module.SimpleModule() {
 
                 private static final long serialVersionUID = 7829254359521781942L;
 

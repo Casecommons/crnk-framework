@@ -6,7 +6,7 @@ dependencies {
     api 'org.reflections:reflections'
     api project(':crnk-gen:crnk-gen-base')
     api project(':crnk-meta')
-    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'tools.jackson.core:jackson-databind'
 
     compileOnly 'org.apache.deltaspike.modules:deltaspike-test-control-module-api:2.0.0'
     compileOnly 'org.apache.deltaspike.cdictrl:deltaspike-cdictrl-api:2.0.0'

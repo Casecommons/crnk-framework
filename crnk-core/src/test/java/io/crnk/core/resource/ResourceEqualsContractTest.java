@@ -16,12 +16,12 @@ public class ResourceEqualsContractTest {
 	@Test
 	public void testResourceEqualsContract() {
 		EqualsVerifier.forClass(Resource.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
-				.withPrefabValues(com.fasterxml.jackson.databind.node.ObjectNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
-				.withPrefabValues(com.fasterxml.jackson.databind.JsonNode.class,
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
-						com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.node.ObjectNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.JsonNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
 				.verify();
 	}
 

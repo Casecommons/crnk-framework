@@ -1,6 +1,6 @@
 package io.crnk.gen.gradle.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.gen.base.GeneratorConfig;
 import io.crnk.gen.base.GeneratorModule;
 import io.crnk.gen.gradle.internal.RuntimeClassLoaderFactory;
@@ -45,13 +45,9 @@ public abstract class ForkedGenerateTask extends JavaExec implements GeneratorTa
         moduleFile.getParentFile().mkdirs();
 
         GeneratorConfig config = getConfig();
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            mapper.writerFor(GeneratorConfig.class).writeValue(mainFile, config);
-            mapper.writerFor(module.getConfig().getClass()).writeValue(moduleFile, module.getConfig());
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder().build();
+        mapper.writerFor(GeneratorConfig.class).writeValue(mainFile, config);
+        mapper.writerFor(module.getConfig().getClass()).writeValue(moduleFile, module.getConfig());
         setArgs(Arrays.asList(mainFile.getAbsolutePath(), moduleFile.getAbsolutePath(), module.getClass().getName()));
     }
 

@@ -1,6 +1,6 @@
 package io.crnk.rs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import java.util.List;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.information.InformationBuilder;

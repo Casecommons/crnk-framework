@@ -1,10 +1,11 @@
 package io.crnk.core.engine.internal.dispatcher.controller;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.boot.CrnkProperties;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.document.Relationship;
@@ -40,7 +41,6 @@ import io.crnk.core.resource.list.DefaultResourceList;
 import io.crnk.core.resource.meta.JsonLinksInformation;
 import io.crnk.core.resource.meta.JsonMetaInformation;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -109,11 +109,12 @@ public abstract class ResourceUpsert extends ResourceIncludeField {
 		if (dataBody.getLinks() != null && linksField != null) {
 			JsonNode linksNode = dataBody.getLinks();
 			Class<?> linksClass = linksField.getType();
-			ObjectReader linksMapper = context.getObjectMapper().readerFor(linksClass);
+			ObjectReader linksMapper = context.getObjectMapper().readerFor(linksClass)
+					.with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			try {
 				Object links = linksMapper.readValue(linksNode);
 				linksField.getAccessor().setValue(instance, links);
-			} catch (IOException e) {
+			} catch (RuntimeException e) {
 				throw newBodyException("failed to parse links information", e);
 			}
 		}
@@ -126,17 +127,18 @@ public abstract class ResourceUpsert extends ResourceIncludeField {
 
 			Class<?> metaClass = metaField.getType();
 
-			ObjectReader metaMapper = context.getObjectMapper().readerFor(metaClass);
+			ObjectReader metaMapper = context.getObjectMapper().readerFor(metaClass)
+					.with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			try {
 				Object meta = metaMapper.readValue(metaNode);
 				metaField.getAccessor().setValue(instance, meta);
-			} catch (IOException e) {
+			} catch (RuntimeException e) {
 				throw newBodyException("failed to parse links information", e);
 			}
 		}
 	}
 
-	protected RuntimeException newBodyException(String message, IOException e) {
+	protected RuntimeException newBodyException(String message, RuntimeException e) {
 		throw new RequestBodyException(message, e);
 	}
 
@@ -190,7 +192,7 @@ public abstract class ResourceUpsert extends ResourceIncludeField {
 				} else if(!isClient()) {
 					throw new BadRequestException(String.format("attribute %s not found", attributeJsonName));
 				}
-			} catch (IOException e) {
+			} catch (RuntimeException e) {
 				throw new ResourceException(
 						String.format("Exception while setting %s.%s=%s due to %s", instance, attributeJsonName, valueNode,
 								e.getMessage()), e);

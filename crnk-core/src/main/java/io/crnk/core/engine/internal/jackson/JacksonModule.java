@@ -1,21 +1,19 @@
 package io.crnk.core.engine.internal.jackson;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.core.Version;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.module.SimpleModule;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.module.Module;
+import io.crnk.core.resource.links.LinksInformation;
 
 public class JacksonModule implements Module {
 
 	private static final String JSON_API_JACKSON_MODULE_NAME = "crnk";
 
-	private final ObjectMapper objectMapper;
-
 	private final boolean serializeLinksAsObjects;
 
 	public JacksonModule(ObjectMapper objectMapper, boolean serializeLinksAsObjects) {
-		this.objectMapper = objectMapper;
 		this.serializeLinksAsObjects = serializeLinksAsObjects;
 	}
 
@@ -26,14 +24,14 @@ public class JacksonModule implements Module {
 
 	@Override
 	public void setupModule(ModuleContext context) {
-		objectMapper.registerModule(createJacksonModule(serializeLinksAsObjects));
+		context.addJacksonModule(createJacksonModule(serializeLinksAsObjects));
 	}
 
 
 	/**
 	 * Creates Crnk Jackson module with all required serializers
 	 *
-	 * @return {@link com.fasterxml.jackson.databind.Module} with custom serializers
+	 * @return {@link tools.jackson.databind.JacksonModule} with custom serializers
 	 */
 	public static SimpleModule createJacksonModule() {
 		return createJacksonModule(false);
@@ -45,14 +43,14 @@ public class JacksonModule implements Module {
 	 *
 	 * @param serializeLinksAsObjects flag which decides whether the {@link LinksInformationSerializer} should be added as
 	 *                                additional serializer or not.
-	 * @return {@link com.fasterxml.jackson.databind.Module} with custom serializers
+	 * @return {@link tools.jackson.databind.JacksonModule} with custom serializers
 	 */
 	public static SimpleModule createJacksonModule(boolean serializeLinksAsObjects) {
 		SimpleModule simpleModule = new SimpleModule(JSON_API_JACKSON_MODULE_NAME,
 				new Version(1, 0, 0, null, null, null));
-		simpleModule.addSerializer(new ErrorDataSerializer());
+		simpleModule.addSerializer(ErrorData.class, new ErrorDataSerializer());
 		simpleModule.addDeserializer(ErrorData.class, new ErrorDataDeserializer());
-		simpleModule.addSerializer(new LinksInformationSerializer(serializeLinksAsObjects));
+		simpleModule.addSerializer(LinksInformation.class, new LinksInformationSerializer(serializeLinksAsObjects));
 
 		return simpleModule;
 	}

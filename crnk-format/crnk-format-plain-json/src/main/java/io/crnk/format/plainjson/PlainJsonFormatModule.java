@@ -1,8 +1,7 @@
 package io.crnk.format.plainjson;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
+import tools.jackson.core.Version;
+import tools.jackson.databind.module.SimpleModule;
 import io.crnk.core.module.InitializingModule;
 import io.crnk.format.plainjson.internal.PlainJsonDocument;
 import io.crnk.format.plainjson.internal.PlainJsonDocumentDeserializer;
@@ -28,15 +27,15 @@ public class PlainJsonFormatModule implements InitializingModule {
         context.addHttpRequestProcessor(
                 new PlainJsonRequestProcessor(context));
 
+        SimpleModule jacksonModule = new SimpleModule("plain-json", new Version(1, 0, 0, null, null, null));
+        jacksonModule.addSerializer(PlainJsonDocument.class, new PlainJsonDocumentSerializer());
+        jacksonModule.addDeserializer(PlainJsonDocument.class, new PlainJsonDocumentDeserializer());
+        context.addJacksonModule(jacksonModule);
     }
 
     @Override
     public void init() {
-        SimpleModule jacksonModule = new SimpleModule("plain-json", new Version(1, 0, 0, null, null, null));
-
-        ObjectMapper objectMapper = context.getObjectMapper();
-        jacksonModule.addSerializer(new PlainJsonDocumentSerializer());
-        jacksonModule.addDeserializer(PlainJsonDocument.class, new PlainJsonDocumentDeserializer(objectMapper));
-        objectMapper.registerModule(jacksonModule);
+        // Jackson module registration moved to setupModule() for Jackson 3 compatibility
+        // (ObjectMapper is immutable in Jackson 3, modules must be registered before build)
     }
 }

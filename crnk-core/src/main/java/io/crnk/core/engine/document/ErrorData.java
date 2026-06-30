@@ -10,35 +10,35 @@ public class ErrorData implements Serializable {
 	/**
 	 * A unique identifier for this particular occurrence of the problem.
 	 */
-	private final String id;
+	private String id;
 
 	/**
 	 * A link that leads to further details about this particular occurrence of the problem.
 	 * <p>
 	 * Wrapped in "links" object.
 	 */
-	private final String aboutLink;
+	private String aboutLink;
 
 	/**
 	 * The HTTP status code applicable to this problem, expressed as a string value.
 	 */
-	private final String status;
+	private String status;
 
 	/**
 	 * An application-specific error code, expressed as a string value.
 	 */
-	private final String code;
+	private String code;
 
 	/**
 	 * A short, human-readable summary of the problem.
 	 * It SHOULD NOT change from occurrence to occurrence of the problem, except for purposes of localization.
 	 */
-	private final String title;
+	private String title;
 
 	/**
 	 * A human-readable explanation specific to this occurrence of the problem.
 	 */
-	private final String detail;
+	private String detail;
 
 	/**
 	 * A JSON Pointer [RFC6901] to the associated entity in the request resource
@@ -46,20 +46,24 @@ public class ErrorData implements Serializable {
 	 * <p>
 	 * Wrapped in "source" object.
 	 */
-	private final String sourcePointer;
+	private String sourcePointer;
 
 	/**
 	 * A string indicating which query legacy caused the error.
 	 * <p>
 	 * Wrapped in "source" object.
 	 */
-	private final String sourceParameter;
+	private String sourceParameter;
 
 	/**
 	 * A meta object containing non-standard meta-information about the error.
 	 */
-	private final Map<String, Object> meta; // NOSONAR this is not transient
+	private Map<String, Object> meta; // NOSONAR this is not transient
 
+
+	@SuppressWarnings("unused")
+	private ErrorData() {
+	}
 
 	protected ErrorData(ErrorDataBuilder builder) {
 		id = builder.getId();

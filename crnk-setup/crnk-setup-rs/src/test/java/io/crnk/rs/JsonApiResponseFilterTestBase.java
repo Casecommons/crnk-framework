@@ -6,8 +6,9 @@ import io.crnk.test.JerseyTestBase;
 import io.crnk.test.mock.TestModule;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.HttpUrlConnectorProvider;
-import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ResourceConfig;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 import org.glassfish.jersey.test.jetty.JettyTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +56,8 @@ public abstract class JsonApiResponseFilterTestBase extends JerseyTestBase {
         TestApplication(JsonApiResponseFilterTestBase instance, boolean enableNullResponse) {
             instance.setEnableNullResponse(enableNullResponse);
 
+            // Disable Jersey's auto-discovery of jackson-media-json-jackson (Jackson 2)
+            property(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
             property(CrnkProperties.NULL_DATA_RESPONSE_ENABLED, Boolean.toString(enableNullResponse));
 
             CrnkFeature feature = new CrnkFeature();
@@ -62,7 +65,7 @@ public abstract class JsonApiResponseFilterTestBase extends JerseyTestBase {
 
             register(new JsonApiResponseFilter(feature));
             register(new JsonapiExceptionMapperBridge(feature));
-            register(new JacksonFeature());
+            register(new JacksonJsonProvider());
 
             register(feature);
         }

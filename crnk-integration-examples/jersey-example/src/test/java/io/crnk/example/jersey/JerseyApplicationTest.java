@@ -3,12 +3,10 @@ package io.crnk.example.jersey;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeType;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.JsonNodeType;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.example.jersey.domain.model.Project;
 import io.crnk.rs.type.JsonApiMediaType;
 import org.glassfish.jersey.test.JerseyTest;
@@ -19,7 +17,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +30,7 @@ import static org.hamcrest.Matchers.notNullValue;
  */
 public class JerseyApplicationTest extends JerseyTest {
 
-	private final ObjectMapper mapper = new ObjectMapper();
+	private final ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder().build();
 
 	@Override
 	protected Application configure() {
@@ -68,21 +65,19 @@ public class JerseyApplicationTest extends JerseyTest {
 		assertThat(project.getName(), is("Great Project"));
 	}
 
-	private Project getProjectFromJson(JsonNode node) throws JsonProcessingException {
+	private Project getProjectFromJson(JsonNode node) {
 		if (node.isObject()) {
 			ObjectNode onode = (ObjectNode) node;
 			final JsonNode type = onode.remove("type");
 			final JsonNode attributes = onode.remove("attributes");
 			final JsonNode relationships = onode.remove("relationships");
 			final JsonNode links = onode.remove("links");
-			Iterator<Map.Entry<String, JsonNode>> fields = attributes.fields();
-			while (fields.hasNext()) {
-				Map.Entry<String, JsonNode> f = fields.next();
+			for (Map.Entry<String, JsonNode> f : attributes.properties()) {
 				onode.put(f.getKey(), f.getValue().textValue());
 			}
 			return mapper.treeToValue(onode, Project.class);
 		} else {
-			throw new JsonMappingException("Not an object: " + node);
+			throw new IllegalArgumentException("Not an object: " + node);
 		}
 	}
 

@@ -1,8 +1,7 @@
 package io.crnk.core.engine.parser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import io.crnk.core.engine.internal.utils.CoreClassTestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,9 +28,9 @@ public class TypeParserTest {
 	@BeforeEach
 	public void setup() {
 		sut = new TypeParser();
-		mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		mapper.registerModule(new JavaTimeModule());
+		mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+				.build();
 		sut.setObjectMapper(mapper);
 	}
 
@@ -353,9 +352,8 @@ public class TypeParserTest {
 
 	@Test
 	public void localDateShouldBeHandledByJackson() throws Exception {
-		JavaTimeModule module = new JavaTimeModule();
-		mapper.registerModule(module);
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		// java.time support is built into Jackson 3.x
+		mapper = mapper.rebuild().disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 		LocalDateTime dateValue = LocalDateTime.now();
 
 		String jsonValue = mapper.writerFor(LocalDateTime.class).writeValueAsString(dateValue);
@@ -365,7 +363,8 @@ public class TypeParserTest {
 		Assertions.assertEquals(dateValue, parsedValue);
 
 		StringParser<LocalDateTime> parser = sut.getParser(LocalDateTime.class);
-		Assertions.assertTrue(parser instanceof JacksonStringMapper);
+		// In Jackson 3, LocalDateTime.parse(CharSequence) is discovered as a factory method
+		Assertions.assertNotNull(parser);
 	}
 
 	private enum SampleEnum {

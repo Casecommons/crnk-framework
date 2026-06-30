@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.information.resource.ResourceInformationProviderModule;
 import io.crnk.core.engine.internal.CoreModule;
 import io.crnk.core.engine.internal.registry.ResourceRegistryImpl;

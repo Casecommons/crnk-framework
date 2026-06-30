@@ -13,6 +13,7 @@ import io.crnk.test.mock.TestModule;
 import io.crnk.test.mock.repository.ScheduleRepositoryImpl;
 import io.crnk.test.mock.repository.TaskRepository;
 import io.restassured.RestAssured;
+import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.jetty.JettyTestContainerFactory;
 import org.glassfish.jersey.test.spi.TestContainerFactory;
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import tools.jackson.jakarta.rs.json.JacksonJsonProvider;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
@@ -58,6 +60,9 @@ public class InteroperabilityTest extends JerseyTestBase {
 
 
         public TestApplication() {
+            // Disable Jersey's auto-discovery of jackson-media-json-jackson (Jackson 2)
+            property(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, true);
+
             register(SampleControllerWithPrefix.class);
 
             feature = new CrnkFeature();
@@ -66,6 +71,7 @@ public class InteroperabilityTest extends JerseyTestBase {
 
             register(new JsonApiResponseFilter(feature));
             register(new JsonapiExceptionMapperBridge(feature));
+            register(new JacksonJsonProvider());
 
             filter = Mockito.spy(new DocumentFilter() {
 

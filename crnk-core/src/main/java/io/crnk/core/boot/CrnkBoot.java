@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 import io.crnk.core.engine.error.ExceptionMapper;
 import io.crnk.core.engine.filter.DocumentFilter;
 import io.crnk.core.engine.filter.ResourceFilter;
@@ -196,6 +197,9 @@ public class CrnkBoot {
 		ResourceRegistryPart rootPart = setupResourceRegistry();
 
 		moduleRegistry.init(objectMapper);
+		// In Jackson 3, ObjectMapper is immutable, so moduleRegistry.init() creates a new
+		// ObjectMapper with Jackson modules applied. Update our reference to use the new one.
+		this.objectMapper = moduleRegistry.getObjectMapper();
 
 		setupRepositories(rootPart);
 
@@ -270,11 +274,14 @@ public class CrnkBoot {
 
 	private void setupObjectMapper() {
 		if (objectMapper == null) {
-			objectMapper = new ObjectMapper();
-			objectMapper.findAndRegisterModules();
-			objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+			objectMapper = JsonMapper.builder()
+					.findAndAddModules()
+					.enable(SerializationFeature.INDENT_OUTPUT)
+					.build();
 		}
-		objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		objectMapper = objectMapper.rebuild()
+				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+				.build();
 
 		moduleRegistry.setObjectMapper(objectMapper);
 	}
@@ -444,7 +451,7 @@ public class CrnkBoot {
 
 	public ObjectMapper getObjectMapper() {
 		if (objectMapper == null) {
-			objectMapper = new ObjectMapper();
+			objectMapper = JsonMapper.builder().build();
 		}
 		return objectMapper;
 	}

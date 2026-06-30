@@ -2,7 +2,7 @@ package io.crnk.core.engine.error;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.ErrorDataBuilder;
 import io.crnk.core.engine.internal.document.mapper.DocumentMapperUtil;
@@ -10,6 +10,7 @@ import io.crnk.core.engine.internal.jackson.JacksonModule;
 import io.crnk.core.engine.internal.utils.JsonApiUrlBuilder;
 import io.crnk.core.engine.properties.NullPropertiesProvider;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,13 +26,14 @@ public class ErrorDataTest {
 
 	@Test
 	public void shouldFulfillEqualsHashCodeContract() {
-		EqualsVerifier.forClass(ErrorData.class).verify();
+		EqualsVerifier.forClass(ErrorData.class).suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 
 	@Test
 	public void testSerialization() throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(JacksonModule.createJacksonModule());
+		ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.addModule(JacksonModule.createJacksonModule())
+				.build();
 
 		ErrorDataBuilder builder = new ErrorDataBuilder();
 		builder.setAboutLink("about");

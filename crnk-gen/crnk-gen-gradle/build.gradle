@@ -29,7 +29,7 @@ dependencies {
     api project(':crnk-gen:crnk-gen-asciidoc')
     api project(':crnk-gen:crnk-gen-openapi')
 
-    api 'com.fasterxml.jackson.core:jackson-databind'
+    api 'tools.jackson.core:jackson-databind'
 
 
     testImplementation gradleTestKit()
