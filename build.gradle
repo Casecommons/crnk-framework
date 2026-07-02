@@ -141,7 +141,6 @@ gradle.beforeProject { Project project ->
 			}
 		}
 
-		// TODO gradle publishing to maven central?
 		if (!docs && !examples && !testProject && !legacyBraveProject) {
 			apply plugin: "jacoco"
 			jacoco {
