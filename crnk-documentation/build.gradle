@@ -151,4 +151,4 @@ promote.dependsOn gitPublishCopy
 gitPublishCommit.mustRunAfter promote
 
 gitPublishCopy.dependsOn assemble
-publish.dependsOn gitPublishPush
+// publish.dependsOn gitPublishPush
