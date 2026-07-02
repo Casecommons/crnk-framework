@@ -1,4 +1,5 @@
 package io.crnk.data.jpa.integration;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.Test;
@@ -166,7 +167,7 @@ public class BasicAttributesIntTest extends AbstractJpaJerseyTest {
 		ResourceRepository<BasicAttributesTestEntity, Serializable> repo =
 				client.getRepositoryForType(BasicAttributesTestEntity.class);
 
-		OffsetDateTime now = OffsetDateTime.now();
+		OffsetDateTime now = OffsetDateTime.now().truncatedTo(ChronoUnit.MILLIS);
 
 		BasicAttributesTestEntity test1 = new BasicAttributesTestEntity();
 		test1.setId(1L);
