@@ -1,6 +1,6 @@
 package io.crnk.core.engine.internal.dispatcher.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.dispatcher.Response;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.document.Resource;
@@ -17,8 +17,8 @@ import io.crnk.core.mock.repository.UserToProjectRepository;
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.repository.ResourceRepository;
 import io.crnk.core.utils.Nullable;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -120,7 +120,7 @@ public class RelationshipsDeleteControllerTest extends ControllerTestBase {
         // THEN
         TaskToProjectRepository taskToProjectRepository = (TaskToProjectRepository) container.getRepository(Task.class, "project");
         Map<Long, Project> map = taskToProjectRepository.findOneRelations(Arrays.asList(taskId), "project", new QuerySpec(Project.class));
-        Assert.assertEquals(1, map.size());
+        Assertions.assertEquals(1, map.size());
         Project project = map.get(taskId);
         assertThat(project.getId()).isEqualTo(projectId);
 
@@ -137,7 +137,7 @@ public class RelationshipsDeleteControllerTest extends ControllerTestBase {
 
         // THEN
         assertThat(result.getHttpStatus()).isEqualTo(HttpStatus.NO_CONTENT_204);
-        Assert.assertNull(project.getTask());
+        Assertions.assertNull(project.getTask());
     }
 
     @Test

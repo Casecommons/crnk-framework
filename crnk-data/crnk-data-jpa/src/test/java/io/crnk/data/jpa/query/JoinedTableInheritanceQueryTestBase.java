@@ -1,8 +1,9 @@
 package io.crnk.data.jpa.query;
 
+import org.junit.jupiter.api.Test;
+
 import io.crnk.data.jpa.model.JoinedTableBaseEntity;
 import io.crnk.data.jpa.model.JoinedTableChildEntity;
-import org.junit.Test;
 
 public abstract class JoinedTableInheritanceQueryTestBase
 		extends AbstractInheritanceTest<JoinedTableBaseEntity, JoinedTableChildEntity> {

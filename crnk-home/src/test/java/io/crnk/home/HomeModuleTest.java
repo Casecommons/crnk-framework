@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Sets;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.node.ObjectNode;
+import java.util.Set;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.http.HttpHeaders;
@@ -25,9 +25,9 @@ import io.crnk.core.engine.url.ConstantServiceUrlProvider;
 import io.crnk.core.exception.BadRequestException;
 import io.crnk.test.mock.ClassTestUtils;
 import io.crnk.test.mock.TestModule;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class HomeModuleTest {
@@ -36,7 +36,7 @@ public class HomeModuleTest {
 
 	private HomeModule module;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		this.module = Mockito.spy(HomeModule.create(HomeFormat.JSON_HOME));
 		boot = new CrnkBoot();
@@ -56,13 +56,13 @@ public class HomeModuleTest {
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
 
 		Mockito.when(context.getPath()).thenReturn("/");
-		Assert.assertTrue(requestProcessor.accepts(contextAdapter));
+		Assertions.assertTrue(requestProcessor.accepts(contextAdapter));
 
 		Mockito.when(context.getPath()).thenReturn("/doesNotExists");
-		Assert.assertFalse(requestProcessor.accepts(contextAdapter));
+		Assertions.assertFalse(requestProcessor.accepts(contextAdapter));
 
 		Mockito.when(context.getPath()).thenReturn("/tasks");
-		Assert.assertFalse(requestProcessor.accepts(contextAdapter));
+		Assertions.assertFalse(requestProcessor.accepts(contextAdapter));
 	}
 
 	@Test
@@ -81,7 +81,7 @@ public class HomeModuleTest {
 
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
 		HttpResponse response = requestProcessor.processAsync(contextAdapter).get();
-		Assert.assertEquals(HttpStatus.BAD_REQUEST_400, response.getStatusCode());
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST_400, response.getStatusCode());
 	}
 
 
@@ -101,10 +101,10 @@ public class HomeModuleTest {
 		Document document = reader.readValue(response.getBody());
 
 		ObjectNode links = document.getLinks();
-		Assert.assertNotNull(links);
+		Assertions.assertNotNull(links);
 		JsonNode history = links.get("history");
-		Assert.assertNotNull(history);
-		Assert.assertEquals("http://localhost/tasks/history", history.asText());
+		Assertions.assertNotNull(history);
+		Assertions.assertEquals("http://localhost/tasks/history", history.asText());
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class HomeModuleTest {
 		Mockito.when(context.getMethod()).thenReturn("GET");
 		Mockito.when(context.getPath()).thenReturn("/tasks");
 		Map<String, Set<String>> parameters = new HashMap<>();
-		parameters.put("test", Sets.newHashSet("foo"));
+		parameters.put("test", Set.of("foo"));
 		Mockito.when(context.getRequestParameters()).thenReturn(parameters);
 		Mockito.when(context.getRequestHeader(Mockito.eq(HttpHeaders.HTTP_HEADER_ACCEPT))).thenReturn(HttpHeaders.JSON_CONTENT_TYPE);
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
@@ -130,10 +130,10 @@ public class HomeModuleTest {
 		Document document = reader.readValue(response.getBody());
 
 		ObjectNode links = document.getLinks();
-		Assert.assertNotNull(links);
+		Assertions.assertNotNull(links);
 		JsonNode history = links.get("history");
-		Assert.assertNotNull(history);
-		Assert.assertEquals("http://localhost/tasks/history?test=foo", history.asText());
+		Assertions.assertNotNull(history);
+		Assertions.assertEquals("http://localhost/tasks/history?test=foo", history.asText());
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class HomeModuleTest {
 		Mockito.when(context.getMethod()).thenReturn("GET");
 		Mockito.when(context.getPath()).thenReturn("/");
 		Map<String, Set<String>> parameters = new HashMap<>();
-		parameters.put("test", Sets.newHashSet("foo"));
+		parameters.put("test", Set.of("foo"));
 		Mockito.when(context.getRequestParameters()).thenReturn(parameters);
 		Mockito.when(context.getRequestHeader(Mockito.eq(HttpHeaders.HTTP_HEADER_ACCEPT))).thenReturn(HttpHeaders.JSON_CONTENT_TYPE);
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
@@ -157,7 +157,7 @@ public class HomeModuleTest {
 
 		ObjectReader reader = boot.getObjectMapper().readerFor(Document.class);
 		String body = new String(response.getBody());
-		Assert.assertTrue(body.contains("projects?test=foo"));
+		Assertions.assertTrue(body.contains("projects?test=foo"));
 	}
 
 	@Test
@@ -171,7 +171,7 @@ public class HomeModuleTest {
 		HttpRequestContextBaseAdapter contextAdapter = new HttpRequestContextBaseAdapter(context);
 
 		HttpRequestProcessor requestProcessor = module.getRequestProcessor();
-		Assert.assertFalse(requestProcessor.accepts(contextAdapter));
+		Assertions.assertFalse(requestProcessor.accepts(contextAdapter));
 	}
 
 	@Test
@@ -182,7 +182,7 @@ public class HomeModuleTest {
 	@Test
 	public void moduleName() {
 		HomeModule module = boot.getModuleRegistry().getModule(HomeModule.class).get();
-		Assert.assertEquals("home", module.getModuleName());
+		Assertions.assertEquals("home", module.getModuleName());
 	}
 
 	@Test

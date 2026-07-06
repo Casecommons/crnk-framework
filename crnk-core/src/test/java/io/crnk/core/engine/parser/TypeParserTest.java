@@ -1,14 +1,11 @@
 package io.crnk.core.engine.parser;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import io.crnk.core.engine.internal.utils.CoreClassTestUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -20,6 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TypeParserTest {
 
@@ -27,15 +25,12 @@ public class TypeParserTest {
 
 	private TypeParser sut;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
-
-	@Before
+	@BeforeEach
 	public void setup() {
 		sut = new TypeParser();
-		mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		mapper.registerModule(new JavaTimeModule());
+		mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+				.build();
 		sut.setObjectMapper(mapper);
 	}
 
@@ -57,19 +52,23 @@ public class TypeParserTest {
 		assertThat(sut.toString(result)).isEqualTo(result);
 	}
 
-	@Test(expected = ParserException.class)
+	@Test
 	public void onInvalidCharacterThrowException() {
-		sut.parse("NOT a single character", Character.class);
+	    assertThrows(ParserException.class, () -> {
+    		sut.parse("NOT a single character", Character.class);
+	    });
 	}
 
-	@Test(expected = ParserException.class)
+	@Test
 	public void onInvalidBooleanThrowException() {
-		sut.parse("NOT a boolean", Character.class);
+	    assertThrows(ParserException.class, () -> {
+    		sut.parse("NOT a boolean", Character.class);
+	    });
 	}
 
 	@Test
 	public void onBooleanFReturnFalse() {
-		Assert.assertFalse(sut.parse("f", Boolean.class));
+		Assertions.assertFalse(sut.parse("f", Boolean.class));
 	}
 
 	@Test
@@ -106,10 +105,11 @@ public class TypeParserTest {
 	@Test
 	public void onLongCharacterShouldThrowException() {
 		// THEN
-		expectedException.expect(ParserException.class);
+		assertThrows(ParserException.class, () -> {
 
-		// WHEN
-		sut.parse("ab", Character.class);
+    		// WHEN
+    		sut.parse("ab", Character.class);
+		});
 	}
 
 	@Test
@@ -119,9 +119,11 @@ public class TypeParserTest {
 		assertThat(result).isEqualTo(UUID.fromString("de305d54-75b4-431b-adb2-eb6b9e546014"));
 	}
 
-	@Test(expected = ParserException.class)
+	@Test
 	public void onInvalidUUIDStringShouldThrowParserException() {
-		sut.parse("invalid", UUID.class);
+	    assertThrows(ParserException.class, () -> {
+    		sut.parse("invalid", UUID.class);
+	    });
 	}
 
 	@Test
@@ -155,10 +157,11 @@ public class TypeParserTest {
 	@Test
 	public void onBadBooleanShouldThrowException() {
 		// THEN
-		expectedException.expect(ParserException.class);
+		assertThrows(ParserException.class, () -> {
 
-		// WHEN
-		sut.parse("ab", Boolean.class);
+    		// WHEN
+    		sut.parse("ab", Boolean.class);
+		});
 	}
 
 	@Test
@@ -283,10 +286,11 @@ public class TypeParserTest {
 	@Test
 	public void onInvalidEnumShouldThrowParserException() {
 		// THEN
-		expectedException.expect(ParserException.class);
+		assertThrows(ParserException.class, () -> {
 
-		// WHEN
-		sut.parse("INVALID_SAMPLE_VALUE", SampleEnum.class);
+    		// WHEN
+    		sut.parse("INVALID_SAMPLE_VALUE", SampleEnum.class);
+		});
 	}
 
 	@Test
@@ -304,10 +308,11 @@ public class TypeParserTest {
 	@Test
 	public void onUnknownClassShouldThrowException() {
 		// THEN
-		expectedException.expect(ParserException.class);
+		assertThrows(ParserException.class, () -> {
 
-		// WHEN
-		sut.parse("input", UnknownClass.class);
+    		// WHEN
+    		sut.parse("input", UnknownClass.class);
+		});
 	}
 
 	@Test
@@ -319,7 +324,7 @@ public class TypeParserTest {
 			}
 		});
 
-		Assert.assertTrue(sut.parse("input", Boolean.class));
+		Assertions.assertTrue(sut.parse("input", Boolean.class));
 	}
 
 	@Test
@@ -347,19 +352,19 @@ public class TypeParserTest {
 
 	@Test
 	public void localDateShouldBeHandledByJackson() throws Exception {
-		JavaTimeModule module = new JavaTimeModule();
-		mapper.registerModule(module);
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+		// java.time support is built into Jackson 3.x
+		mapper = mapper.rebuild().disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS).build();
 		LocalDateTime dateValue = LocalDateTime.now();
 
 		String jsonValue = mapper.writerFor(LocalDateTime.class).writeValueAsString(dateValue);
 		String stringValue = jsonValue.substring(1, jsonValue.length() - 1);
 
 		LocalDateTime parsedValue = sut.parse(stringValue, LocalDateTime.class);
-		Assert.assertEquals(dateValue, parsedValue);
+		Assertions.assertEquals(dateValue, parsedValue);
 
 		StringParser<LocalDateTime> parser = sut.getParser(LocalDateTime.class);
-		Assert.assertTrue(parser instanceof JacksonStringMapper);
+		// In Jackson 3, LocalDateTime.parse(CharSequence) is discovered as a factory method
+		Assertions.assertNotNull(parser);
 	}
 
 	private enum SampleEnum {

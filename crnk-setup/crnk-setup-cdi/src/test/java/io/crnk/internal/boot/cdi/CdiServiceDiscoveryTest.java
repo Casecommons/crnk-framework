@@ -10,48 +10,61 @@ import io.crnk.core.resource.annotations.JsonApiExposed;
 import io.crnk.internal.boot.cdi.model.CdiTestExceptionMapper;
 import io.crnk.internal.boot.cdi.model.ProjectRepository;
 import io.crnk.internal.boot.cdi.model.TaskRepository;
-import org.apache.deltaspike.testcontrol.api.junit.CdiTestRunner;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 import java.util.List;
 import java.util.Optional;
 
-@RunWith(CdiTestRunner.class)
-@ApplicationScoped
 public class CdiServiceDiscoveryTest {
+
+	private WeldContainer container;
+
+	@BeforeEach
+	public void setup() {
+		container = new Weld().initialize();
+	}
+
+	@AfterEach
+	public void tearDown() {
+		if (container != null) {
+			container.close();
+		}
+	}
 
 	@Test
 	public void testSetter() {
 		CdiServiceDiscovery discovery = new CdiServiceDiscovery();
 
 		BeanManager beanManager = discovery.getBeanManager();
-		Assert.assertNotNull(discovery.getBeanManager());
+		Assertions.assertNotNull(discovery.getBeanManager());
 
 		BeanManager mock = Mockito.mock(BeanManager.class);
 		discovery.setBeanManager(mock);
-		Assert.assertSame(mock, discovery.getBeanManager());
-		Assert.assertNotSame(mock, beanManager);
+		Assertions.assertSame(mock, discovery.getBeanManager());
+		Assertions.assertNotSame(mock, beanManager);
 	}
 
 	@Test
 	public void testFactory() {
 		DefaultServiceDiscoveryFactory factory = new DefaultServiceDiscoveryFactory();
 		ServiceDiscovery instance = factory.getInstance();
-		Assert.assertNotNull(instance);
-		Assert.assertEquals(CdiServiceDiscovery.class, instance.getClass());
+		Assertions.assertNotNull(instance);
+		Assertions.assertEquals(CdiServiceDiscovery.class, instance.getClass());
 
 		List<?> repositories = instance.getInstancesByType(Repository.class);
-		Assert.assertEquals(1, repositories.size());
-		Assert.assertTrue(repositories.get(0) instanceof ProjectRepository);
+		Assertions.assertEquals(1, repositories.size());
+		Assertions.assertTrue(repositories.get(0) instanceof ProjectRepository);
 
 		repositories = instance.getInstancesByAnnotation(JsonApiExposed.class);
-		Assert.assertEquals(1, repositories.size());
-		Assert.assertTrue(repositories.get(0) instanceof TaskRepository);
+		Assertions.assertEquals(1, repositories.size());
+		Assertions.assertTrue(repositories.get(0) instanceof TaskRepository);
 	}
 
 	@Test
@@ -60,7 +73,7 @@ public class CdiServiceDiscoveryTest {
 		boot.boot();
 
 		Optional<ExceptionMapper> mapper = boot.getExceptionMapperRegistry().findMapperFor(IllegalStateException.class);
-		Assert.assertTrue(mapper.isPresent());
-		Assert.assertTrue(mapper.get() instanceof CdiTestExceptionMapper);
+		Assertions.assertTrue(mapper.isPresent());
+		Assertions.assertTrue(mapper.get() instanceof CdiTestExceptionMapper);
 	}
 }

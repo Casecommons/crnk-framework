@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.engine.document.Document;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.Relationship;
@@ -38,9 +36,8 @@ import io.crnk.core.resource.links.Link;
 import io.crnk.core.resource.links.LinksInformation;
 import io.crnk.core.resource.meta.MetaInformation;
 import io.crnk.core.utils.Nullable;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 public class DocumentMapperTest extends AbstractDocumentMapperTest {
@@ -51,10 +48,10 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertEquals("sample task", resource.getAttributes().get("name").asText());
-		Assert.assertThat(resource.getAttributes().get("writeOnlyValue"), CoreMatchers.nullValue());
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertEquals("sample task", resource.getAttributes().get("name").asText());
+		Assertions.assertNull(resource.getAttributes().get("writeOnlyValue"));
 	}
 
 	@Test
@@ -65,12 +62,12 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertNull(resource.getLinks());
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertNull(resource.getLinks());
 
 		Relationship relationship = resource.getRelationships().get("project");
-		Assert.assertNull(relationship.getLinks());
+		Assertions.assertNull(relationship.getLinks());
 	}
 
 	@Test
@@ -79,7 +76,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		QueryAdapter adapter = createAdapter(Task.class);
 //		Mockito.when(container.getRequestContextBase().getRequestUri()).thenReturn(URI.create("http://localhost/api/foo"));
 		Document document = mapper.toDocument(toResponse(task), adapter, mappingConfig).get();
-		Assert.assertEquals("http://127.0.0.1", getLinkText(document.getLinks().get("self")));
+		Assertions.assertEquals("http://127.0.0.1", getLinkText(document.getLinks().get("self")));
 	}
 
 	public static class TaskLinks implements LinksInformation {
@@ -101,13 +98,13 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertNull(resource.getLinks().get("self"));
-		Assert.assertNotNull(resource.getLinks().get("someLink"));
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertNull(resource.getLinks().get("self"));
+		Assertions.assertNotNull(resource.getLinks().get("someLink"));
 
 		Relationship project = resource.getRelationships().get("project");
-		Assert.assertNull(project.getLinks());
+		Assertions.assertNull(project.getLinks());
 	}
 
 	@Test
@@ -127,12 +124,12 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), queryAdapter, config).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship projectRel = resource.getRelationships().get("project");
 		ObjectNode links = projectRel.getLinks();
-		Assert.assertFalse(links.has("self"));
-		Assert.assertTrue(links.has("related"));
+		Assertions.assertFalse(links.has("self"));
+		Assertions.assertTrue(links.has("related"));
 	}
 
 	@Test
@@ -152,17 +149,17 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), queryAdapter, mappingConfig.clone()).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertNull(resource.getLinks().get("self"));
-		Assert.assertNotNull(resource.getLinks().get("someLink"));
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertNull(resource.getLinks().get("self"));
+		Assertions.assertNotNull(resource.getLinks().get("someLink"));
 
 		Relationship projectRel = resource.getRelationships().get("project");
-		Assert.assertNull(projectRel.getLinks());
+		Assertions.assertNull(projectRel.getLinks());
 
-		Assert.assertEquals(1, document.getIncluded().size());
+		Assertions.assertEquals(1, document.getIncluded().size());
 		Resource projectResource = document.getIncluded().get(0);
-		Assert.assertNull(projectResource.getRelationships().get("tasks"));
+		Assertions.assertNull(projectResource.getRelationships().get("tasks"));
 	}
 
 
@@ -178,17 +175,17 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), queryAdapter, mappingConfig.clone()).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertEquals("http://something.else.net/api/tasks/3", getLinkText(resource.getLinks().get("self")));
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertEquals("http://something.else.net/api/tasks/3", getLinkText(resource.getLinks().get("self")));
 
 		Relationship projectRel = resource.getRelationships().get("project");
-		Assert.assertEquals("http://something.else.net/api/tasks/3/relationships/project", getLinkText(projectRel.getLinks().get("self")));
+		Assertions.assertEquals("http://something.else.net/api/tasks/3/relationships/project", getLinkText(projectRel.getLinks().get("self")));
 	}
 
 
 	@Test
-	public void testJsonIncludeNonEmptyOnId() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyOnId() throws Exception {
 		Project project = new Project();
 		project.setName("someProject");
 
@@ -202,15 +199,15 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(project), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertNull(resource.getId());
+		Assertions.assertNull(resource.getId());
 
 		ObjectWriter writer = container.getObjectMapper().writerFor(Resource.class);
 		String json = writer.writeValueAsString(resource);
-		Assert.assertFalse(json.contains("\"id\""));
+		Assertions.assertFalse(json.contains("\"id\""));
 	}
 
 	@Test
-	public void testJsonIncludeNonEmptyIgnoresNull() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyIgnoresNull() throws Exception {
 		// note that desc and followup project make use of @JsonInclude.Include.NON_EMPTY
 		Schedule schedule = new Schedule();
 		schedule.setDesc(null);
@@ -223,13 +220,13 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		Document document = mapper.toDocument(toResponse(schedule), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
 
-		Assert.assertFalse(resource.getAttributes().containsKey("description"));
-		Assert.assertFalse(resource.getRelationships().containsKey("followup"));
+		Assertions.assertFalse(resource.getAttributes().containsKey("description"));
+		Assertions.assertFalse(resource.getRelationships().containsKey("followup"));
 	}
 
 
 	@Test
-	public void testJsonIncludeNonEmptyIgnoresEmptyList() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyIgnoresEmptyList() throws Exception {
 		// makes use of @JsonInclude.Include.NON_EMPTY
 		Schedule schedule = new Schedule();
 		schedule.setKeywords(Collections.emptyList());
@@ -242,12 +239,12 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		Document document = mapper.toDocument(toResponse(schedule), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
 
-		Assert.assertFalse(resource.getAttributes().containsKey("keywords"));
-		Assert.assertFalse(resource.getRelationships().containsKey("tasks"));
+		Assertions.assertFalse(resource.getAttributes().containsKey("keywords"));
+		Assertions.assertFalse(resource.getRelationships().containsKey("tasks"));
 	}
 
 	@Test
-	public void testJsonIncludeNonEmptyWritesNonEmpty() throws JsonProcessingException {
+	public void testJsonIncludeNonEmptyWritesNonEmpty() throws Exception {
 		Project project = new Project();
 		project.setId(12L);
 
@@ -263,8 +260,8 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		Document document = mapper.toDocument(toResponse(schedule), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
 
-		Assert.assertTrue(resource.getAttributes().containsKey("description"));
-		Assert.assertTrue(resource.getRelationships().containsKey("followup"));
+		Assertions.assertTrue(resource.getAttributes().containsKey("description"));
+		Assertions.assertTrue(resource.getRelationships().containsKey("followup"));
 	}
 
 	@Test
@@ -275,7 +272,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		QuerySpecAdapter queryAdapter = (QuerySpecAdapter) toAdapter(new QuerySpec(Project.class));
 		Document document = mapper.toDocument(toResponse(schedule), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertFalse(resource.getAttributes().containsKey("dueDate"));
+		Assertions.assertFalse(resource.getAttributes().containsKey("dueDate"));
 	}
 
 	@Test
@@ -287,9 +284,9 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		Document document = mapper.toDocument(toResponse(schedule), queryAdapter, mappingConfig).get();
 		Resource resource = document.getSingleData().get();
 
-		Assert.assertTrue(resource.getAttributes().containsKey("dueDate"));
+		Assertions.assertTrue(resource.getAttributes().containsKey("dueDate"));
 		JsonNode node = resource.getAttributes().get("dueDate");
-		Assert.assertTrue(node.asText().length() > 0);
+		Assertions.assertTrue(node.asText().length() > 0);
 	}
 
 
@@ -304,7 +301,7 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		// The only difference standard document only has is a self link
 		standardDocument.setLinks(null);
-		Assert.assertEquals(standardDocument, compactDocument);
+		Assertions.assertEquals(standardDocument, compactDocument);
 	}
 
 	@Test
@@ -322,8 +319,8 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 		response.setLinksInformation(links);
 
 		Document document = mapper.toDocument(response, createAdapter(Task.class), mappingConfig).get();
-		Assert.assertEquals("linksValue", getLinkText(document.getLinks().get("value")));
-		Assert.assertEquals("metaValue", document.getMeta().get("value").asText());
+		Assertions.assertEquals("linksValue", getLinkText(document.getLinks().get("value")));
+		Assertions.assertEquals("metaValue", document.getMeta().get("value").asText());
 	}
 
 	@Test
@@ -340,8 +337,8 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("linksValue", getLinkText(resource.getLinks().get("value")));
-		Assert.assertEquals("metaValue", resource.getMeta().get("value").asText());
+		Assertions.assertEquals("linksValue", getLinkText(resource.getLinks().get("value")));
+		Assertions.assertEquals("metaValue", resource.getMeta().get("value").asText());
 	}
 
 	@Test
@@ -353,8 +350,8 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(response, createAdapter(Task.class), mappingConfig).get();
 		List<ErrorData> errors = document.getErrors();
-		Assert.assertEquals(1, errors.size());
-		Assert.assertSame(error, errors.get(0));
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertSame(error, errors.get(0));
 	}
 
 	@Test
@@ -365,16 +362,16 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship relationship = resource.getRelationships().get("project");
-		Assert.assertNotNull(relationship);
+		Assertions.assertNotNull(relationship);
 		ResourceIdentifier relationshipData = relationship.getSingleData().get();
-		Assert.assertNotNull(relationshipData);
-		Assert.assertEquals("3", relationshipData.getId());
-		Assert.assertEquals("projects", relationshipData.getType());
+		Assertions.assertNotNull(relationshipData);
+		Assertions.assertEquals("3", relationshipData.getId());
+		Assertions.assertEquals("projects", relationshipData.getType());
 
-		Assert.assertTrue(document.getIncluded().isEmpty());
+		Assertions.assertTrue(document.getIncluded().isEmpty());
 	}
 
 	@Test
@@ -386,13 +383,13 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship relationship = resource.getRelationships().get("projects");
-		Assert.assertNotNull(relationship);
+		Assertions.assertNotNull(relationship);
 		Nullable<List<ResourceIdentifier>> relationshipData = relationship.getCollectionData();
-		Assert.assertFalse(relationshipData.isPresent());
-		Assert.assertTrue(document.getIncluded().isEmpty());
+		Assertions.assertFalse(relationshipData.isPresent());
+		Assertions.assertTrue(document.getIncluded().isEmpty());
 	}
 
 	@Test
@@ -407,28 +404,28 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), toAdapter(querySpec), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship relationship = resource.getRelationships().get("projects");
-		Assert.assertNotNull(relationship);
+		Assertions.assertNotNull(relationship);
 		List<ResourceIdentifier> relationshipData = relationship.getCollectionData().get();
-		Assert.assertNotNull(relationshipData);
-		Assert.assertEquals(2, relationshipData.size());
-		Assert.assertEquals("3", relationshipData.get(0).getId());
-		Assert.assertEquals("projects", relationshipData.get(0).getType());
-		Assert.assertEquals("4", relationshipData.get(1).getId());
-		Assert.assertEquals("projects", relationshipData.get(1).getType());
+		Assertions.assertNotNull(relationshipData);
+		Assertions.assertEquals(2, relationshipData.size());
+		Assertions.assertEquals("3", relationshipData.get(0).getId());
+		Assertions.assertEquals("projects", relationshipData.get(0).getType());
+		Assertions.assertEquals("4", relationshipData.get(1).getId());
+		Assertions.assertEquals("projects", relationshipData.get(1).getType());
 
-		Assert.assertFalse(document.getIncluded().isEmpty());
+		Assertions.assertFalse(document.getIncluded().isEmpty());
 
 		List<Resource> included = document.getIncluded();
-		Assert.assertEquals(2, included.size());
-		Assert.assertEquals("3", included.get(0).getId());
-		Assert.assertEquals("projects", included.get(0).getType());
-		Assert.assertEquals("sample project3", included.get(0).getAttributes().get("name").asText());
-		Assert.assertEquals("4", included.get(1).getId());
-		Assert.assertEquals("projects", included.get(1).getType());
-		Assert.assertEquals("sample project4", included.get(1).getAttributes().get("name").asText());
+		Assertions.assertEquals(2, included.size());
+		Assertions.assertEquals("3", included.get(0).getId());
+		Assertions.assertEquals("projects", included.get(0).getType());
+		Assertions.assertEquals("sample project3", included.get(0).getAttributes().get("name").asText());
+		Assertions.assertEquals("4", included.get(1).getId());
+		Assertions.assertEquals("projects", included.get(1).getType());
+		Assertions.assertEquals("sample project4", included.get(1).getAttributes().get("name").asText());
 	}
 
 	@Test
@@ -442,20 +439,20 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), toAdapter(querySpec), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship relationship = resource.getRelationships().get("project");
-		Assert.assertNotNull(relationship);
+		Assertions.assertNotNull(relationship);
 		ResourceIdentifier relationshipData = relationship.getSingleData().get();
-		Assert.assertNotNull(relationshipData);
-		Assert.assertEquals("3", relationshipData.getId());
-		Assert.assertEquals("projects", relationshipData.getType());
+		Assertions.assertNotNull(relationshipData);
+		Assertions.assertEquals("3", relationshipData.getId());
+		Assertions.assertEquals("projects", relationshipData.getType());
 
 		List<Resource> included = document.getIncluded();
-		Assert.assertEquals(1, included.size());
-		Assert.assertEquals("3", included.get(0).getId());
-		Assert.assertEquals("projects", included.get(0).getType());
-		Assert.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
+		Assertions.assertEquals(1, included.size());
+		Assertions.assertEquals("3", included.get(0).getId());
+		Assertions.assertEquals("projects", included.get(0).getType());
+		Assertions.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
 	}
 
 	@Test
@@ -471,21 +468,21 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), toAdapter(querySpec), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
+		Assertions.assertEquals("2", resource.getId());
 
 		Relationship relationship = resource.getRelationships().get("project");
-		Assert.assertNotNull(relationship);
+		Assertions.assertNotNull(relationship);
 		ResourceIdentifier relationshipData = relationship.getSingleData().get();
-		Assert.assertNotNull(relationshipData);
-		Assert.assertEquals("3", relationshipData.getId());
-		Assert.assertEquals("projects", relationshipData.getType());
+		Assertions.assertNotNull(relationshipData);
+		Assertions.assertEquals("3", relationshipData.getId());
+		Assertions.assertEquals("projects", relationshipData.getType());
 
 		List<Resource> included = document.getIncluded();
-		Assert.assertEquals(1, included.size());
-		Assert.assertEquals("3", included.get(0).getId());
-		Assert.assertEquals("projects", included.get(0).getType());
-		Assert.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
-		Assert.assertEquals("2", included.get(0).getRelationships().get("task").getSingleData().get().getId());
+		Assertions.assertEquals(1, included.size());
+		Assertions.assertEquals("3", included.get(0).getId());
+		Assertions.assertEquals("projects", included.get(0).getType());
+		Assertions.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
+		Assertions.assertEquals("2", included.get(0).getRelationships().get("task").getSingleData().get().getId());
 	}
 
 	@Test
@@ -496,25 +493,25 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertEquals("sample task", resource.getAttributes().get("name").asText());
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertEquals("sample task", resource.getAttributes().get("name").asText());
 
 		Relationship relationship = resource.getRelationships().get("project");
-		Assert.assertNotNull(relationship);
-		Assert.assertEquals("http://127.0.0.1/tasks/2/relationships/project",
+		Assertions.assertNotNull(relationship);
+		Assertions.assertEquals("http://127.0.0.1/tasks/2/relationships/project",
 				getLinkText(relationship.getLinks().get("self")));
-		Assert.assertEquals("http://127.0.0.1/tasks/2/project", getLinkText(relationship.getLinks().get("related")));
+		Assertions.assertEquals("http://127.0.0.1/tasks/2/project", getLinkText(relationship.getLinks().get("related")));
 		ResourceIdentifier relationshipData = relationship.getSingleData().get();
-		Assert.assertNotNull(relationshipData);
-		Assert.assertEquals("3", relationshipData.getId());
-		Assert.assertEquals("projects", relationshipData.getType());
+		Assertions.assertNotNull(relationshipData);
+		Assertions.assertEquals("3", relationshipData.getId());
+		Assertions.assertEquals("projects", relationshipData.getType());
 
 		List<Resource> included = document.getIncluded();
-		Assert.assertEquals(1, included.size());
-		Assert.assertEquals("3", included.get(0).getId());
-		Assert.assertEquals("projects", included.get(0).getType());
-		Assert.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
+		Assertions.assertEquals(1, included.size());
+		Assertions.assertEquals("3", included.get(0).getId());
+		Assertions.assertEquals("projects", included.get(0).getType());
+		Assertions.assertEquals("sample project", included.get(0).getAttributes().get("name").asText());
 	}
 
 	@Test
@@ -536,21 +533,21 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(project), queryAdapter, new DocumentMappingConfig()).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("3", resource.getId());
-		Assert.assertEquals("projects", resource.getType());
+		Assertions.assertEquals("3", resource.getId());
+		Assertions.assertEquals("projects", resource.getType());
 
 		Relationship taskRel = resource.getRelationships().get("task");
-		Assert.assertNotNull(taskRel.getLinks());
-		Assert.assertTrue(taskRel.getData().isPresent());
-		Assert.assertNotNull(taskRel.getData().get());
+		Assertions.assertNotNull(taskRel.getLinks());
+		Assertions.assertTrue(taskRel.getData().isPresent());
+		Assertions.assertNotNull(taskRel.getData().get());
 
 		Relationship tasksRel = resource.getRelationships().get("tasks");
-		Assert.assertNotNull(tasksRel.getLinks());
-		Assert.assertTrue(tasksRel.getData().isPresent());
-		Assert.assertNotNull(tasksRel.getData().get());
-		Assert.assertEquals(2, tasksRel.getCollectionData().get().size());
+		Assertions.assertNotNull(tasksRel.getLinks());
+		Assertions.assertTrue(tasksRel.getData().isPresent());
+		Assertions.assertNotNull(tasksRel.getData().get());
+		Assertions.assertEquals(2, tasksRel.getCollectionData().get().size());
 
-		Assert.assertEquals(3, document.getIncluded().size());
+		Assertions.assertEquals(3, document.getIncluded().size());
 	}
 
 	@Test
@@ -582,28 +579,28 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task1), queryAdapter, new DocumentMappingConfig()).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("1", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
+		Assertions.assertEquals("1", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
 
 		Relationship projectRel = resource.getRelationships().get("project");
-		Assert.assertNotNull(projectRel.getLinks());
-		Assert.assertTrue(projectRel.getData().isPresent());
-		Assert.assertNotNull(projectRel.getData().get());
+		Assertions.assertNotNull(projectRel.getLinks());
+		Assertions.assertTrue(projectRel.getData().isPresent());
+		Assertions.assertNotNull(projectRel.getData().get());
 
 		Relationship projectsRel = resource.getRelationships().get("projectsInit");
-		Assert.assertNotNull(projectsRel.getLinks());
-		Assert.assertTrue(projectsRel.getData().isPresent());
-		Assert.assertNotNull(projectsRel.getData().get());
-		Assert.assertEquals(1, projectsRel.getCollectionData().get().size());
+		Assertions.assertNotNull(projectsRel.getLinks());
+		Assertions.assertTrue(projectsRel.getData().isPresent());
+		Assertions.assertNotNull(projectsRel.getData().get());
+		Assertions.assertEquals(1, projectsRel.getCollectionData().get().size());
 
-		Assert.assertEquals(3, document.getIncluded().size());
+		Assertions.assertEquals(3, document.getIncluded().size());
 
 		List<Resource> included = document.getIncluded();
 		Resource projectResource2 = included.get(0);
 		Resource projectResource3 = included.get(1);
 
-		Assert.assertTrue(projectResource2.getRelationships().get("task").getData().isPresent());
-		Assert.assertTrue(projectResource3.getRelationships().get("task").getData().isPresent());
+		Assertions.assertTrue(projectResource2.getRelationships().get("task").getData().isPresent());
+		Assertions.assertTrue(projectResource3.getRelationships().get("task").getData().isPresent());
 	}
 
 	@Test
@@ -614,18 +611,18 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(toResponse(task), createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("lazy_tasks", resource.getType());
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("lazy_tasks", resource.getType());
 
 		Relationship relationship = resource.getRelationships().get("lazyProject");
-		Assert.assertNotNull(relationship);
-		Assert.assertEquals("http://127.0.0.1/lazy_tasks/2/relationships/lazyProject",
+		Assertions.assertNotNull(relationship);
+		Assertions.assertEquals("http://127.0.0.1/lazy_tasks/2/relationships/lazyProject",
 				getLinkText(relationship.getLinks().get("self")));
-		Assert.assertEquals("http://127.0.0.1/lazy_tasks/2/lazyProject",
+		Assertions.assertEquals("http://127.0.0.1/lazy_tasks/2/lazyProject",
 				getLinkText(relationship.getLinks().get("related")));
 		Nullable<ResourceIdentifier> relationshipData = relationship.getSingleData();
-		Assert.assertFalse(relationshipData.isPresent());
-		Assert.assertTrue(document.getIncluded().isEmpty());
+		Assertions.assertFalse(relationshipData.isPresent());
+		Assertions.assertTrue(document.getIncluded().isEmpty());
 	}
 
 	@Test
@@ -641,11 +638,11 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(response, toAdapter(querySpec), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("2", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
-		Assert.assertNull(resource.getAttributes().get("name"));
-		Assert.assertNull(resource.getRelationships().get("project"));
-		Assert.assertEquals("sample category", resource.getAttributes().get("category").asText());
+		Assertions.assertEquals("2", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
+		Assertions.assertNull(resource.getAttributes().get("name"));
+		Assertions.assertNull(resource.getRelationships().get("project"));
+		Assertions.assertEquals("sample category", resource.getAttributes().get("category").asText());
 	}
 
 	@Test
@@ -658,15 +655,15 @@ public class DocumentMapperTest extends AbstractDocumentMapperTest {
 
 		Document document = mapper.toDocument(response, createAdapter(Task.class), mappingConfig).get();
 		Resource resource = document.getSingleData().get();
-		Assert.assertEquals("3", resource.getId());
-		Assert.assertEquals("tasks", resource.getType());
+		Assertions.assertEquals("3", resource.getId());
+		Assertions.assertEquals("tasks", resource.getType());
 		// check if the attributes are returned in alphabetical order as per the JsonPropertyOrder on Task
-		Assert.assertTrue(resource.getAttributes() instanceof LinkedHashMap);
-		Assert.assertEquals(resource.getAttributes().keySet(),
+		Assertions.assertTrue(resource.getAttributes() instanceof LinkedHashMap);
+		Assertions.assertEquals(resource.getAttributes().keySet(),
 				Stream.of("category", "completed", "deleted", "name", "otherTasks", "readOnlyValue", "status")
 						.collect(Collectors.toCollection(LinkedHashSet::new)));
-		Assert.assertEquals("sample name", resource.getAttributes().get("name").asText());
-		Assert.assertEquals("sample category", resource.getAttributes().get("category").asText());
+		Assertions.assertEquals("sample name", resource.getAttributes().get("name").asText());
+		Assertions.assertEquals("sample category", resource.getAttributes().get("category").asText());
 	}
 
 	private Project createProject(long id, String name) {

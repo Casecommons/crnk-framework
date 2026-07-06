@@ -1,8 +1,9 @@
 package io.crnk.core.repository;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.crnk.core.exception.MethodNotAllowedException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ReadOnlyRelationshipRepositoryBaseTest {
 
@@ -11,48 +12,66 @@ public class ReadOnlyRelationshipRepositoryBaseTest {
 
 	};
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void getSourceResourceClass() {
-		repo.getSourceResourceClass();
+	    assertThrows(UnsupportedOperationException.class, () -> {
+    		repo.getSourceResourceClass();
+	    });
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void getMatcher() {
-		repo.getMatcher();
+	    assertThrows(UnsupportedOperationException.class, () -> {
+    		repo.getMatcher();
+	    });
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void getTargetResourceClass() {
-		repo.getTargetResourceClass();
+	    assertThrows(UnsupportedOperationException.class, () -> {
+    		repo.getTargetResourceClass();
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void findOneTarget() {
-		repo.findOneTarget(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.findOneTarget(null, null, null);
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void findManyTargets() {
-		repo.findManyTargets(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.findManyTargets(null, null, null);
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void setRelation() {
-		repo.setRelation(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.setRelation(null, null, null);
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void setRelations() {
-		repo.setRelations(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.setRelations(null, null, null);
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void addRelations() {
-		repo.addRelations(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.addRelations(null, null, null);
+	    });
 	}
 
-	@Test(expected = MethodNotAllowedException.class)
+	@Test
 	public void removeRelations() {
-		repo.removeRelations(null, null, null);
+	    assertThrows(MethodNotAllowedException.class, () -> {
+    		repo.removeRelations(null, null, null);
+	    });
 	}
 }

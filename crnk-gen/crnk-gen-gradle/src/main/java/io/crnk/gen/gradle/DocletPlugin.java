@@ -1,6 +1,5 @@
 package io.crnk.gen.gradle;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.gradle.api.Plugin;
@@ -25,18 +24,19 @@ public class DocletPlugin implements Plugin<Project> {
 
 		project.getDependencies().add("crnkJavaDocToXml", "com.github.markusbernhardt:xml-doclet:1.0.5");
 
-		Javadoc task = project.getTasks().create(TASK_NAME, Javadoc.class);
-		task.setTitle(null);
-		task.setDestinationDir(new File(project.getBuildDir(), "crnk-xml-docs"));
+		project.getTasks().register(TASK_NAME, Javadoc.class, task -> {
+			task.setTitle(null);
+			task.setDestinationDir(project.getLayout().getBuildDirectory().dir("crnk-xml-docs").get().getAsFile());
 
-		MinimalJavadocOptions options = task.getOptions();
-		options.setDoclet("com.github.markusbernhardt.xmldoclet.XmlDoclet");
-		options.setMemberLevel(JavadocMemberLevel.PRIVATE);
-		options.setDocletpath(new ArrayList<>(config.getFiles()));
+			MinimalJavadocOptions options = task.getOptions();
+			options.setDoclet("com.github.markusbernhardt.xmldoclet.XmlDoclet");
+			options.setMemberLevel(JavadocMemberLevel.PRIVATE);
+			options.setDocletpath(new ArrayList<>(config.getFiles()));
 
-		SourceSetContainer sourceSets = (SourceSetContainer) project.getProperties().get("sourceSets");
-		SourceSet mainSourceSet = sourceSets.getByName("main");
-		task.source(mainSourceSet.getAllJava());
-		task.setClasspath(mainSourceSet.getCompileClasspath());
+			SourceSetContainer sourceSets = project.getExtensions().getByType(SourceSetContainer.class);
+			SourceSet mainSourceSet = sourceSets.getByName("main");
+			task.source(mainSourceSet.getAllJava());
+			task.setClasspath(mainSourceSet.getCompileClasspath());
+		});
 	}
 }

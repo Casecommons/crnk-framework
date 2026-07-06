@@ -11,9 +11,10 @@ import io.crnk.meta.model.MetaKey;
 import io.crnk.meta.model.resource.MetaResource;
 import io.crnk.meta.provider.resource.ResourceMetaProvider;
 import io.crnk.test.mock.models.Task;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 
@@ -21,7 +22,7 @@ public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 
 	private MetaLookupImpl lookup;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		super.setup();
 
@@ -41,26 +42,34 @@ public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 		repo.setHttpRequestContextProvider(container.getModuleRegistry().getHttpRequestContextProvider());
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void checkReadOnly1() {
-		repo.setRelation(null, null, null);
+		assertThrows(UnsupportedOperationException.class, () -> {
+			repo.setRelation(null, null, null);
+		});
 	}
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void checkReadOnly2() {
-		repo.setRelations(null, null, null);
+		assertThrows(UnsupportedOperationException.class, () -> {
+			repo.setRelations(null, null, null);
+		});
 	}
 
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void checkReadOnly3() {
-		repo.addRelations(null, null, null);
+		assertThrows(UnsupportedOperationException.class, () -> {
+			repo.addRelations(null, null, null);
+		});
 	}
 
 
-	@Test(expected = UnsupportedOperationException.class)
+	@Test
 	public void checkReadOnly4() {
-		repo.removeRelations(null, null, null);
+		assertThrows(UnsupportedOperationException.class, () -> {
+			repo.removeRelations(null, null, null);
+		});
 	}
 
 
@@ -69,8 +78,8 @@ public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 		MetaResource resource = resourceProvider.getMeta(Task.class);
 
 		MetaKey key = (MetaKey) repo.findOneTarget(resource.getId(), "primaryKey", new QuerySpec(MetaElement.class));
-		Assert.assertNotNull(key);
-		Assert.assertEquals("id", key.getUniqueElement().getName());
+		Assertions.assertNotNull(key);
+		Assertions.assertEquals("id", key.getUniqueElement().getName());
 	}
 
 	@Test
@@ -79,12 +88,14 @@ public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 		resource.setPrimaryKey(null);
 
 		MetaKey key = (MetaKey) repo.findOneTarget(resource.getId(), "primaryKey", new QuerySpec(MetaElement.class));
-		Assert.assertNull(key);
+		Assertions.assertNull(key);
 	}
 
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void findOneTargetReturnsExceptionWhenSourceNotFound() {
-		repo.findOneTarget("does not exist", "primaryKey", new QuerySpec(MetaElement.class));
+		assertThrows(ResourceNotFoundException.class, () -> {
+			repo.findOneTarget("does not exist", "primaryKey", new QuerySpec(MetaElement.class));
+		});
 	}
 
 	@Test
@@ -93,21 +104,25 @@ public class MetaRelationshipRepositoryImplTest extends AbstractMetaTest {
 
 		ResourceList<MetaElement> children = repo.findManyTargets(resource.getId(), "children", new QuerySpec(MetaElement
 				.class));
-		Assert.assertNotEquals(0, children.size());
+		Assertions.assertNotEquals(0, children.size());
 	}
 
 
-	@Test(expected = ClassCastException.class)
+	@Test
 	public void findManyTargetCannotBeUsedForSingeValuesRelations() {
-		MetaResource resource = resourceProvider.getMeta(Task.class);
-		repo.findManyTargets(resource.getId(), "primaryKey", new QuerySpec(MetaElement
-				.class));
+		assertThrows(ClassCastException.class, () -> {
+			MetaResource resource = resourceProvider.getMeta(Task.class);
+			repo.findManyTargets(resource.getId(), "primaryKey", new QuerySpec(MetaElement
+					.class));
+		});
 	}
 
 
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void findManyTargetReturnsExceptionWhenSourceNotFound() {
-		repo.findManyTargets("does not exist", "children", new QuerySpec(MetaElement.class));
+		assertThrows(ResourceNotFoundException.class, () -> {
+			repo.findManyTargets("does not exist", "children", new QuerySpec(MetaElement.class));
+		});
 	}
 
 }

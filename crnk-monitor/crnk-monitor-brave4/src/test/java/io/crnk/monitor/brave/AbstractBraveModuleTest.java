@@ -1,6 +1,9 @@
 package io.crnk.monitor.brave;
 
 import brave.Tracing;
+import brave.handler.MutableSpan;
+import brave.handler.SpanHandler;
+import brave.propagation.TraceContext;
 import io.crnk.client.CrnkClient;
 import io.crnk.client.http.HttpAdapter;
 import io.crnk.client.http.okhttp.OkHttpAdapter;
@@ -20,21 +23,16 @@ import io.crnk.monitor.brave.mock.repository.TaskToProjectRepository;
 import io.crnk.rs.CrnkFeature;
 import io.crnk.test.JerseyTestBase;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import zipkin2.Endpoint;
-import zipkin2.Span;
-import zipkin2.reporter.Reporter;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractBraveModuleTest extends JerseyTestBase {
@@ -43,9 +41,9 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
 
     protected ResourceRepository<Task, Long> taskRepo;
 
-    private Reporter<Span> clientReporter;
+    private List<MutableSpan> clientSpans;
 
-    private Reporter<Span> serverReporter;
+    private List<MutableSpan> serverSpans;
 
     private HttpAdapter httpAdapter;
 
@@ -58,15 +56,19 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
     }
 
 
-    @Before
-    @SuppressWarnings("unchecked")
+    @BeforeEach
     public void setup() {
-        Endpoint localEndpoint = Endpoint.newBuilder().serviceName("testClient").build();
-
-        clientReporter = Mockito.mock(Reporter.class);
+        clientSpans = new ArrayList<>();
+        SpanHandler clientHandler = new SpanHandler() {
+            @Override
+            public boolean end(TraceContext context, MutableSpan span, Cause cause) {
+                clientSpans.add(span);
+                return true;
+            }
+        };
         Tracing clientTracing = Tracing.newBuilder()
-                .spanReporter(clientReporter)
-                .localEndpoint(localEndpoint)
+                .addSpanHandler(clientHandler)
+                .localServiceName("testClient")
                 .build();
 
         client = new CrnkClient(getBaseUri().toString());
@@ -86,22 +88,16 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
         taskRepo.create(task);
 
         // check client call and link span
-        ArgumentCaptor<Span> clientSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(clientReporter, Mockito.times(1)).report(clientSpanCaptor.capture());
-        List<Span> clientSpans = clientSpanCaptor.getAllValues();
-        Span callSpan = clientSpans.get(0);
-        Assert.assertEquals("post", callSpan.name());
-        Assert.assertEquals(Span.Kind.CLIENT, callSpan.kind());
+        Assertions.assertEquals(1, clientSpans.size());
+        MutableSpan callSpan = clientSpans.get(0);
+        Assertions.assertEquals("post", callSpan.name().toLowerCase());
+        Assertions.assertEquals(brave.Span.Kind.CLIENT, callSpan.kind());
 
         // check server local span
-        ArgumentCaptor<Span> serverSpanCaptor = ArgumentCaptor.forClass(Span.class);
-
-        // will resolve resource + relationship
-        Mockito.verify(serverReporter, Mockito.times(1)).report(serverSpanCaptor.capture());
-        List<Span> serverSpans = serverSpanCaptor.getAllValues();
-        Span repositorySpan = serverSpans.get(0);
-        Assert.assertEquals("crnk:post:/tasks/13/", repositorySpan.name());
-        Assert.assertTrue(repositorySpan.toString().contains("\"lc\""));
+        Assertions.assertEquals(1, serverSpans.size());
+        MutableSpan repositorySpan = serverSpans.get(0);
+        Assertions.assertEquals("crnk:POST:/tasks/13/", repositorySpan.name());
+        Assertions.assertNotNull(repositorySpan.tag("lc"));
         assertTag(repositorySpan, "lc", "crnk");
         assertTag(repositorySpan, "crnk.query", "?");
 
@@ -118,21 +114,17 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
         }
 
         // check client call and link span
-        ArgumentCaptor<Span> clientSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(clientReporter, Mockito.times(1)).report(clientSpanCaptor.capture());
-        List<Span> clientSpans = clientSpanCaptor.getAllValues();
-        Span callSpan = clientSpans.get(0);
-        Assert.assertEquals("post", callSpan.name());
-        Assert.assertEquals(Span.Kind.CLIENT, callSpan.kind());
+        Assertions.assertEquals(1, clientSpans.size());
+        MutableSpan callSpan = clientSpans.get(0);
+        Assertions.assertEquals("post", callSpan.name().toLowerCase());
+        Assertions.assertEquals(brave.Span.Kind.CLIENT, callSpan.kind());
         assertTag(callSpan, "http.status_code", "500");
 
         // check server local span
-        ArgumentCaptor<Span> serverSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(serverReporter, Mockito.times(1)).report(serverSpanCaptor.capture());
-        List<Span> serverSpans = serverSpanCaptor.getAllValues();
-        Span repositorySpan = serverSpans.get(0);
-        Assert.assertEquals("crnk:post:/tasks/13/", repositorySpan.name());
-        Assert.assertTrue(repositorySpan.toString().contains("\"lc\""));
+        Assertions.assertEquals(1, serverSpans.size());
+        MutableSpan repositorySpan = serverSpans.get(0);
+        Assertions.assertEquals("crnk:POST:/tasks/13/", repositorySpan.name());
+        Assertions.assertNotNull(repositorySpan.tag("lc"));
 
         assertTag(repositorySpan, "lc", "crnk");
         assertTag(repositorySpan, "crnk.query", "?");
@@ -149,20 +141,16 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
         taskRepo.findAll(querySpec);
 
         // check client call and link span
-        ArgumentCaptor<Span> clientSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(clientReporter, Mockito.times(isOkHttp ? 1 : 1)).report(clientSpanCaptor.capture());
-        List<Span> clientSpans = clientSpanCaptor.getAllValues();
-        Span callSpan = clientSpans.get(0);
-        Assert.assertEquals("get", callSpan.name());
-        Assert.assertEquals(Span.Kind.CLIENT, callSpan.kind());
+        Assertions.assertEquals(1, clientSpans.size());
+        MutableSpan callSpan = clientSpans.get(0);
+        Assertions.assertEquals("get", callSpan.name().toLowerCase());
+        Assertions.assertEquals(brave.Span.Kind.CLIENT, callSpan.kind());
 
         // check server local span
-        ArgumentCaptor<Span> serverSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(serverReporter, Mockito.times(1)).report(serverSpanCaptor.capture());
-        List<Span> serverSpans = serverSpanCaptor.getAllValues();
-        Span repositorySpan = serverSpans.get(0);
-        Assert.assertEquals("crnk:get:/tasks/", repositorySpan.name());
-        Assert.assertTrue(repositorySpan.toString().contains("\"lc\""));
+        Assertions.assertEquals(1, serverSpans.size());
+        MutableSpan repositorySpan = serverSpans.get(0);
+        Assertions.assertEquals("crnk:GET:/tasks/", repositorySpan.name());
+        Assertions.assertNotNull(repositorySpan.tag("lc"));
 
         assertTag(repositorySpan, "lc", "crnk");
         assertTag(repositorySpan, "crnk.query", "?filter[name]=doe");
@@ -177,29 +165,25 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
         relRepo.findManyTargets(123L, "tasks", new QuerySpec(Task.class));
 
         // check client call and link span
-        ArgumentCaptor<Span> clientSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(clientReporter, Mockito.times(1)).report(clientSpanCaptor.capture());
-        List<Span> clientSpans = clientSpanCaptor.getAllValues();
-        Span callSpan = clientSpans.get(0);
-        Assert.assertEquals("get", callSpan.name());
-        Assert.assertEquals(Span.Kind.CLIENT, callSpan.kind());
+        Assertions.assertEquals(1, clientSpans.size());
+        MutableSpan callSpan = clientSpans.get(0);
+        Assertions.assertEquals("get", callSpan.name().toLowerCase());
+        Assertions.assertEquals(brave.Span.Kind.CLIENT, callSpan.kind());
 
         // check server local span
-        ArgumentCaptor<Span> serverSpanCaptor = ArgumentCaptor.forClass(Span.class);
-        Mockito.verify(serverReporter, Mockito.times(2)).report(serverSpanCaptor.capture());
-        List<Span> serverSpans = serverSpanCaptor.getAllValues();
+        Assertions.assertEquals(2, serverSpans.size());
 
-        Span repositorySpan0 = serverSpans.get(0);
-        Assert.assertEquals("crnk:get:/tasks/", repositorySpan0.name());
-        Assert.assertTrue(repositorySpan0.toString().contains("\"lc\""));
+        MutableSpan repositorySpan0 = serverSpans.get(0);
+        Assertions.assertEquals("crnk:GET:/tasks/", repositorySpan0.name());
+        Assertions.assertNotNull(repositorySpan0.tag("lc"));
 
         assertTag(repositorySpan0, "lc", "crnk");
         assertTag(repositorySpan0, "crnk.results", "0");
         assertTag(repositorySpan0, "crnk.status", "OK");
 
-        Span repositorySpan1 = serverSpans.get(1);
-        Assert.assertEquals("crnk:get:/projects/123/tasks/", repositorySpan1.name());
-        Assert.assertTrue(repositorySpan1.toString().contains("\"lc\""));
+        MutableSpan repositorySpan1 = serverSpans.get(1);
+        Assertions.assertEquals("crnk:GET:/projects/123/tasks/", repositorySpan1.name());
+        Assertions.assertNotNull(repositorySpan1.tag("lc"));
 
         assertTag(repositorySpan1, "lc", "crnk");
         assertTag(repositorySpan1, "crnk.query", "?");
@@ -207,16 +191,12 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
         assertTag(repositorySpan1, "crnk.status", "OK");
     }
 
-    private void assertTag(Span span, String name, String value) {
-        for (Map.Entry<String, String> entry : span.tags().entrySet()) {
-            if (entry.getKey().equals(name)) {
-                if (value != null) {
-                    Assert.assertEquals(value, entry.getValue());
-                }
-                return;
-            }
+    private void assertTag(MutableSpan span, String name, String value) {
+        String tagValue = span.tag(name);
+        Assertions.assertNotNull(tagValue, name + " not found");
+        if (value != null) {
+            Assertions.assertEquals(value, tagValue);
         }
-        Assert.fail(name + " not found");
     }
 
     @Override
@@ -227,15 +207,21 @@ public abstract class AbstractBraveModuleTest extends JerseyTestBase {
     @ApplicationPath("/")
     private class TestApplication extends ResourceConfig {
 
-        @SuppressWarnings("unchecked")
         public TestApplication() {
             property(CrnkProperties.RESOURCE_DEFAULT_DOMAIN, "http://test.local");
 
-            serverReporter = Mockito.mock(Reporter.class);
+            serverSpans = new ArrayList<>();
+            SpanHandler serverHandler = new SpanHandler() {
+                @Override
+                public boolean end(TraceContext context, MutableSpan span, Cause cause) {
+                    serverSpans.add(span);
+                    return true;
+                }
+            };
 
             Tracing tracing = Tracing.newBuilder()
                     .localServiceName("testServer")
-                    .spanReporter(serverReporter)
+                    .addSpanHandler(serverHandler)
                     .build();
 
             SimpleModule testModule = new SimpleModule("test");

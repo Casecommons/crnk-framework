@@ -1,10 +1,10 @@
 package io.crnk.core.resource.meta;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
 import io.crnk.core.engine.internal.utils.CastableInformation;
 import io.crnk.core.resource.links.LinksInformation;
 
@@ -35,10 +35,11 @@ public class JsonLinksInformation implements LinksInformation, CastableInformati
 			if (linksClass.isInterface()) {
 				return JsonMetaInformation.createInterfaceJsonAdapter(linksClass, data, mapper);
 			}
-			ObjectReader reader = mapper.readerFor(linksClass);
+			ObjectReader reader = mapper.readerFor(linksClass)
+					.with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 			return reader.readValue(data);
 		}
-		catch (IOException e) {
+		catch (JacksonException e) {
 			throw new IllegalStateException(e);
 		}
 	}

@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.From;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.MapJoin;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.From;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.MapJoin;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 
 import io.crnk.core.engine.internal.utils.PreconditionUtil;
 import io.crnk.core.queryspec.Direction;
@@ -231,16 +231,24 @@ public class JpaCriteriaQueryBackend<T> implements JpaQueryBackend<From<?, ?>, O
 		}
 	}
 
+	private boolean isPluralPath(Expression<?> expression) {
+		if (expression instanceof Path) {
+			jakarta.persistence.metamodel.Bindable<?> model = ((Path<?>) expression).getModel();
+			return model instanceof jakarta.persistence.metamodel.PluralAttribute;
+		}
+		return Collection.class.isAssignableFrom(expression.getJavaType());
+	}
+
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	private Predicate handleEquals(Expression<?> expression, FilterOperator operator, Object value) {
 		if (value instanceof List) {
 			Predicate p = expression.in(((List<?>) value).toArray());
 			return negateIfNeeded(p, operator);
-		} else if (Collection.class.isAssignableFrom(expression.getJavaType())) {
-			Predicate p = cb.literal(value).in(expression);
-			return negateIfNeeded(p, operator);
 		} else if (expression instanceof MapJoin) {
 			Predicate p = cb.literal(value).in(((MapJoin) expression).value());
+			return negateIfNeeded(p, operator);
+		} else if (isPluralPath(expression)) {
+			Predicate p = cb.isMember(value, (Expression<Collection>) expression);
 			return negateIfNeeded(p, operator);
 		} else if (value == null) {
 			return negateIfNeeded(cb.isNull(expression), operator);

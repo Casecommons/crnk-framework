@@ -1,9 +1,9 @@
 package io.crnk.core.engine.internal.information.resource;
 
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import tools.jackson.databind.AnnotationIntrospector;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.introspect.AnnotatedClass;
 import io.crnk.core.engine.internal.utils.ExceptionUtil;
 import io.crnk.core.engine.internal.utils.PreconditionUtil;
 
@@ -29,6 +29,14 @@ public class AnnotatedClassBuilder {
 
 	public static AnnotatedClass build(final Class<?> declaringClass, final SerializationConfig serializationConfig) {
 
+		// Since Jackson 2.9 the static AnnotatedClass#construct factory methods have been replaced by
+		// AnnotatedClassResolver. In Jackson 2.20 the legacy methods are gone entirely, so prefer the
+		// resolver when present and only fall back to the historic reflection-based lookup otherwise.
+		AnnotatedClass resolved = buildViaResolver(declaringClass, serializationConfig);
+		if (resolved != null) {
+			return resolved;
+		}
+
 		for (final Method method : AnnotatedClass.class.getMethods()) {
 			if (CONSTRUCT_METHOD_NAME.equals(method.getName()) &&
 					method.getParameterTypes().length == 3) {
@@ -42,6 +50,26 @@ public class AnnotatedClassBuilder {
 			}
 		}
 		throw new IllegalStateException(CANNOT_FIND_PROPER_METHOD);
+	}
+
+	private static AnnotatedClass buildViaResolver(final Class<?> declaringClass, final SerializationConfig serializationConfig) {
+		final Class<?> resolverClass;
+		try {
+			resolverClass = Class.forName("tools.jackson.databind.introspect.AnnotatedClassResolver");
+		} catch (ClassNotFoundException e) {
+			return null;
+		}
+		return ExceptionUtil.wrapCatchedExceptions(new Callable<AnnotatedClass>() {
+			@Override
+			public AnnotatedClass call() throws Exception {
+				JavaType declaringType = serializationConfig.constructType(declaringClass);
+				Method resolve = resolverClass.getMethod("resolve",
+						tools.jackson.databind.cfg.MapperConfig.class,
+						JavaType.class,
+						tools.jackson.databind.introspect.MixInResolver.class);
+				return (AnnotatedClass) resolve.invoke(null, serializationConfig, declaringType, serializationConfig);
+			}
+		}, "Exception while building AnnotatedClass via AnnotatedClassResolver");
 	}
 
 	private static AnnotatedClass buildAnnotatedClass(Method method, Class<?> declaringClass,

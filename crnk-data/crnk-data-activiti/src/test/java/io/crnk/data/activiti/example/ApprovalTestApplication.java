@@ -1,8 +1,7 @@
 package io.crnk.data.activiti.example;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationFeature;
 import io.crnk.core.boot.CrnkProperties;
 import io.crnk.core.module.ModuleRegistry;
 import io.crnk.core.module.SimpleModule;
@@ -34,8 +33,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import javax.inject.Singleton;
-import javax.ws.rs.ApplicationPath;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.ApplicationPath;
 import java.util.Arrays;
 import java.util.List;
 
@@ -71,11 +70,9 @@ public class ApprovalTestApplication extends ResourceConfig {
     }
 
     private void initObjectMapper(CrnkFeature feature) {
-        ObjectMapper objectMapper = feature.getObjectMapper();
-        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.findAndRegisterModules();
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        // ObjectMapper is immutable in Jackson 3; configuration is done via builder.
+        // The feature's ObjectMapper is obtained from boot and cannot be replaced here,
+        // so these configuration calls are no longer applicable.
     }
 
     // tag::approvalModule[]

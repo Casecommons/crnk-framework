@@ -169,7 +169,7 @@ public class RuntimeClassLoaderFactory {
 	public Set<File> getProjectLibraries() {
 		Set<File> classpath = new HashSet<>();
 
-		SourceSetContainer sourceSets = (SourceSetContainer) project.getProperties().get("sourceSets");
+		SourceSetContainer sourceSets = project.getExtensions().findByType(SourceSetContainer.class);
 
 		if (sourceSets != null) {
 			SortedSet<String> availableSourceSetNames = sourceSets.getNames();
@@ -188,6 +188,9 @@ public class RuntimeClassLoaderFactory {
 
 		ConfigurationContainer configurations = project.getConfigurations();
 		Configuration runtimeConfiguration = configurations.findByName(configurationName + "Runtime");
+		if (runtimeConfiguration == null) {
+			runtimeConfiguration = configurations.findByName(configurationName + "RuntimeClasspath");
+		}
 		if (runtimeConfiguration == null) {
 			runtimeConfiguration = configurations.getByName(configurationName);
 		}

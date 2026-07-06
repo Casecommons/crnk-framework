@@ -1,21 +1,29 @@
 package io.crnk.core.engine.document;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.internal.jackson.JacksonModule;
 import io.crnk.core.utils.Nullable;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RelationshipTest {
 
 	@Test
 	public void testResourceEqualsContract() {
-		EqualsVerifier.forClass(Relationship.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(Relationship.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
+				.withPrefabValues(tools.jackson.databind.node.ObjectNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.JsonNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.verify();
 	}
 
 	@Test
@@ -44,21 +52,24 @@ public class RelationshipTest {
 		Relationship relationship = new Relationship();
 		ResourceIdentifier id = new ResourceIdentifier("a", "b");
 		relationship.setData(Nullable.of(id));
-		Assert.assertEquals(Arrays.asList(id), relationship.getCollectionData().get());
+		Assertions.assertEquals(Arrays.asList(id), relationship.getCollectionData().get());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void setInvalidDataThrowsException() {
-		Relationship relationship = new Relationship();
-		relationship.setData(Nullable.of("not a ResourceIdentifier"));
+	    assertThrows(IllegalStateException.class, () -> {
+    		Relationship relationship = new Relationship();
+    		relationship.setData(Nullable.of("not a ResourceIdentifier"));
+	    });
 	}
 
 
 	private void checkSerialize(Relationship relationship) throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(JacksonModule.createJacksonModule());
+		ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.addModule(JacksonModule.createJacksonModule())
+				.build();
 		String json = mapper.writeValueAsString(relationship);
 		Relationship copy = mapper.readerFor(Relationship.class).readValue(json);
-		Assert.assertEquals(relationship, copy);
+		Assertions.assertEquals(relationship, copy);
 	}
 }

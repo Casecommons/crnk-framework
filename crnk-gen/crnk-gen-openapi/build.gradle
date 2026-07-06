@@ -1,27 +1,30 @@
 apply plugin: 'java'
 
 dependencies {
-    compile project(':crnk-meta')
-    compile project(':crnk-client')
-    compile project(':crnk-gen:crnk-gen-base')
+    api project(':crnk-meta')
+    api project(':crnk-client')
+    api project(':crnk-gen:crnk-gen-base')
 
-    compile 'guru.nidi:graphviz-java:0.8.3'
-    compile 'io.swagger.core.v3:swagger-integration:2.0.8'
-    compile 'io.swagger.core.v3:swagger-core:2.0.8'
-    compile 'io.swagger.core.v3:swagger-models:2.0.8'
-    compile 'io.swagger.parser.v3:swagger-parser:2.0.8'
+    api 'guru.nidi:graphviz-java:0.18.1'
+    // Jakarta-namespace swagger-core. The old 2.0.8 line pulled in swagger 1.x models and calls
+    // BeanDescription.findJsonValueMethod(), which Jackson removed in 2.18; the -jakarta 2.2.x line is
+    // Jackson 2.20-compatible (uses findJsonValueAccessor) and aligns with the jakarta migration.
+    api 'io.swagger.core.v3:swagger-integration-jakarta:2.2.37'
+    api 'io.swagger.core.v3:swagger-core-jakarta:2.2.37'
+    api 'io.swagger.core.v3:swagger-models-jakarta:2.2.37'
+    api 'io.swagger.parser.v3:swagger-parser:2.1.42'
 
-    testCompile 'commons-io:commons-io:2.5'
-    testCompile project(':crnk-meta')
-    testCompile project(':crnk-test')
-    testCompile project(':crnk-format:crnk-format-plain-json')
+    testImplementation 'commons-io:commons-io:2.14.0'
+    testImplementation project(':crnk-meta')
+    testImplementation project(':crnk-test')
+    testImplementation project(':crnk-format:crnk-format-plain-json')
 }
 
 test {
     testLogging.showStandardStreams = true
 }
 
-// compile generated openapi files
+// api generated openapi files
 tasks.test.doFirst {
     delete 'build/tmp/openapi'
 }

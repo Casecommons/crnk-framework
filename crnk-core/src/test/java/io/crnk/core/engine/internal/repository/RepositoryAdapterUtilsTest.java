@@ -13,20 +13,24 @@ import io.crnk.core.queryspec.pagingspec.OffsetLimitPagingBehavior;
 import io.crnk.core.resource.links.LinksInformation;
 import io.crnk.core.resource.list.DefaultResourceList;
 import io.crnk.core.resource.list.ResourceList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+// The shared setup() stubs more collaborators than this single test exercises; under the strict
+// MockitoJUnitRunner (default since Mockito 2) that triggers UnnecessaryStubbingException. Use the
+// lenient (Silent) runner to preserve the original intent of the shared fixture.
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class RepositoryAdapterUtilsTest {
 
 	private static final String TEST_PATH = "http://test.path/";
@@ -51,7 +55,7 @@ public class RepositoryAdapterUtilsTest {
 	@Mock
 	private OffsetLimitPagingBehavior offsetLimitPagingBehavior;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		CrnkBoot boot = new CrnkBoot();
 		boot.addModule(new CoreTestModule());
@@ -76,6 +80,6 @@ public class RepositoryAdapterUtilsTest {
 
 		LinksInformation result = RepositoryAdapterUtils.enrichLinksInformation(moduleRegistry, null, resources, requestSpec);
 
-		assertThat(result, is(nullValue()));
+		assertNull(result);
 	}
 }

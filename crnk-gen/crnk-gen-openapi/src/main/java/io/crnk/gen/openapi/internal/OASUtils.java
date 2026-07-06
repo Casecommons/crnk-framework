@@ -118,7 +118,7 @@ public class OASUtils {
 		} else if (metaType.getName().equals("byte")) {
 			return new ByteArraySchema();
 		} else if (metaType.getName().equals("date")) {
-			return new DateSchema();
+			return new DateTimeSchema();
 		} else if (metaType.getName().equals("offsetDateTime")) {
 			return new DateTimeSchema();
 		} else if (metaType.getName().equals("localDate")) {

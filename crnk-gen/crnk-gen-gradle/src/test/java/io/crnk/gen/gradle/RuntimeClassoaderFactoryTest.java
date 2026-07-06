@@ -13,16 +13,18 @@ import io.crnk.gen.typescript.model.TSMember;
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.testfixtures.ProjectBuilder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class RuntimeClassoaderFactoryTest {
 
-	@Rule
-	public TemporaryFolder testProjectDir = new TemporaryFolder();
+	
+	@TempDir
+	public File testProjectDir;
 
 	private RuntimeClassLoaderFactory.SharedClassLoader sharedClassLoader;
 
@@ -31,14 +33,14 @@ public class RuntimeClassoaderFactoryTest {
 	private RuntimeClassLoaderFactory factory;
 
 
-	@Before
+	@BeforeEach
 	public void setup() throws IOException {
 		// TODO address dependency resolution issues
 		GeneratorPlugin.APPLY_DOCLET_BY_DEFAULT = false;
 
-		testProjectDir.newFolder("src", "main", "java");
+		new File(testProjectDir, "src/main/java").mkdirs();
 
-		File outputDir = testProjectDir.getRoot();
+		File outputDir = testProjectDir;
 
 		Project project = ProjectBuilder.builder().withName("crnk-gen-typescript-test").withProjectDir(outputDir).build();
 		project.setVersion("0.0.1");
@@ -62,46 +64,50 @@ public class RuntimeClassoaderFactoryTest {
 	public void checkSharedClassAccessible() throws ClassNotFoundException {
 		sharedClassLoader.putSharedClass("test", String.class);
 
-		Assert.assertSame(String.class, classLoader.loadClass("test"));
-		Assert.assertSame(String.class, sharedClassLoader.loadClass("test"));
+		Assertions.assertSame(String.class, classLoader.loadClass("test"));
+		Assertions.assertSame(String.class, sharedClassLoader.loadClass("test"));
 	}
 
 	@Test
 	public void checkBootstrapClassesAccessible() throws ClassNotFoundException {
-		Assert.assertSame(String.class, classLoader.loadClass(String.class.getName()));
-		Assert.assertSame(Object.class, classLoader.loadClass(Object.class.getName()));
+		Assertions.assertSame(String.class, classLoader.loadClass(String.class.getName()));
+		Assertions.assertSame(Object.class, classLoader.loadClass(Object.class.getName()));
 	}
 
 
 	@Test
 	public void checkTypescriptModelExposed() throws ClassNotFoundException {
-		Assert.assertSame(TSMember.class, classLoader.loadClass(TSMember.class.getName()));
-		Assert.assertSame(TSClassType.class, classLoader.loadClass(TSClassType.class.getName()));
-		Assert.assertSame(TSImport.class, classLoader.loadClass(TSImport.class.getName()));
+		Assertions.assertSame(TSMember.class, classLoader.loadClass(TSMember.class.getName()));
+		Assertions.assertSame(TSClassType.class, classLoader.loadClass(TSClassType.class.getName()));
+		Assertions.assertSame(TSImport.class, classLoader.loadClass(TSImport.class.getName()));
 	}
 
 	@Test
 	public void defaultLogbackTestProvidedFromParentClassloader() {
-		Assert.assertNotNull(classLoader.getResource("logback-test.xml"));
+		Assertions.assertNotNull(classLoader.getResource("logback-test.xml"));
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void defaultLogbackTestNotProvidedWithInvalidParentClassLoader() {
-		ClassLoader bootstrapClassLoader = ClassLoader.getSystemClassLoader().getParent();
-		classLoader = factory.createClassLoader(bootstrapClassLoader, true);
-		Assert.assertNull(bootstrapClassLoader.getResource("logback-test.xml"));
-		Assert.assertNull(classLoader.getResource("logback-test.xml"));
+		assertThrows(IllegalStateException.class, () -> {
+			ClassLoader bootstrapClassLoader = ClassLoader.getSystemClassLoader().getParent();
+			classLoader = factory.createClassLoader(bootstrapClassLoader, true);
+			Assertions.assertNull(bootstrapClassLoader.getResource("logback-test.xml"));
+			Assertions.assertNull(classLoader.getResource("logback-test.xml"));
+		});
 	}
 
 	@Test
 	public void classLoaderExposesTestConfiguration() {
-		Assert.assertNotEquals(0, classLoader.getURLs().length);
+		Assertions.assertNotEquals(0, classLoader.getURLs().length);
 	}
 
-	@Test(expected = ClassNotFoundException.class)
+	@Test
 	public void classLoaderIsolatesCallerEnvironment() throws ClassNotFoundException {
-		// methods from context classpath should not be accessible
-		classLoader.loadClass(Resource.class.getName());
+		assertThrows(ClassNotFoundException.class, () -> {
+			// methods from context classpath should not be accessible
+			classLoader.loadClass(Resource.class.getName());
+		});
 	}
 
 }

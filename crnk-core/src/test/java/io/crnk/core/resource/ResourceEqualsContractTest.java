@@ -4,7 +4,7 @@ import io.crnk.core.engine.document.Resource;
 import io.crnk.core.engine.document.ResourceIdentifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ResourceEqualsContractTest {
 
@@ -15,7 +15,14 @@ public class ResourceEqualsContractTest {
 
 	@Test
 	public void testResourceEqualsContract() {
-		EqualsVerifier.forClass(Resource.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS).verify();
+		EqualsVerifier.forClass(Resource.class).usingGetClass().suppress(Warning.NONFINAL_FIELDS)
+				.withPrefabValues(tools.jackson.databind.node.ObjectNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.withPrefabValues(tools.jackson.databind.JsonNode.class,
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode(),
+						tools.jackson.databind.node.JsonNodeFactory.instance.objectNode().put("a", "b"))
+				.verify();
 	}
 
 }

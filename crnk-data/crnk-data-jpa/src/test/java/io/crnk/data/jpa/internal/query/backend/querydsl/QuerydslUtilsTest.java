@@ -1,8 +1,11 @@
 package io.crnk.data.jpa.internal.query.backend.querydsl;
 
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.querydsl.core.types.Expression;
 import io.crnk.test.mock.ClassTestUtils;
-import org.junit.Test;
 import org.mockito.Mockito;
 
 public class QuerydslUtilsTest {
@@ -12,21 +15,27 @@ public class QuerydslUtilsTest {
 		ClassTestUtils.assertPrivateConstructor(QuerydslUtils.class);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void throwExceptionWhenAccessingInvalidEntityPath() {
-		QuerydslUtils.getEntityPath(InvalidEntity.class);
+		assertThrows(IllegalStateException.class, () -> {
+			QuerydslUtils.getEntityPath(InvalidEntity.class);
+		});
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void throwExceptionWhenGettingInvalidQueryClass() {
-		QuerydslUtils.getQueryClass(InvalidEntity.class);
+		assertThrows(IllegalStateException.class, () -> {
+			QuerydslUtils.getQueryClass(InvalidEntity.class);
+		});
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void throwExceptionWhenFollowingInvalidPath() {
-		Expression<?> expression = Mockito.mock(Expression.class);
-		Mockito.when(expression.getType()).thenReturn((Class) InvalidEntity.class);
-		QuerydslUtils.get(expression, "doesNotExist");
+		assertThrows(IllegalStateException.class, () -> {
+			Expression<?> expression = Mockito.mock(Expression.class);
+			Mockito.when(expression.getType()).thenReturn((Class) InvalidEntity.class);
+			QuerydslUtils.get(expression, "doesNotExist");
+		});
 	}
 
 	class InvalidEntity {

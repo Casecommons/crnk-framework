@@ -59,7 +59,7 @@ public class GeneratorPlugin implements Plugin<Project> {
 		for (GeneratorModule module : loader) {
 			LOGGER.debug("discovered generator module: {}", module.getName());
 			modules.add(module);
-			module.initDefaults(project.getBuildDir());
+			module.initDefaults(project.getLayout().getBuildDirectory().get().getAsFile());
 			config.getModuleConfig().put(module.getName(), module.getConfig());
 		}
 		LOGGER.debug("discovered {} modules", modules.size());
@@ -80,15 +80,16 @@ public class GeneratorPlugin implements Plugin<Project> {
 	}
 
 	private Task setupCleanTask(Project project, GeneratorModule module) {
-		Task task = project.getTasks().create(getCleanTaskName(module), DefaultTask.class);
+		Task task = project.getTasks().register(getCleanTaskName(module), DefaultTask.class).get();
 		task.doFirst(task1 -> project.delete(module.getConfig().getGenDir()));
 		return task;
 	}
 
 	private Task setupGenerateTask(Project project, GeneratorModule module) {
 		GeneratorConfig config = project.getExtensions().getByType(GeneratorConfig.class);
-		Class taskClass = config.isForked() ? ForkedGenerateTask.class : InMemoryGeneratorTask.class;
-		Task task = project.getTasks().create(getGenerateTaskName(module), taskClass);
+		@SuppressWarnings("unchecked")
+		Class<? extends Task> taskClass = (Class<? extends Task>) (config.isForked() ? ForkedGenerateTask.class : InMemoryGeneratorTask.class);
+		Task task = project.getTasks().register(getGenerateTaskName(module), taskClass).get();
 
 		((GeneratorTaskContract) task).setModule(module);
 

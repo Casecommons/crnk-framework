@@ -2,9 +2,7 @@ package io.crnk.core.resource.field;
 
 import io.crnk.core.engine.internal.information.resource.ReflectionFieldAccessor;
 import io.crnk.core.engine.internal.utils.PropertyException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,22 +11,21 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ReflectionFieldAccessorTest {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void onNullBeanGetShouldThrowException() {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "privatePropertyWithMutator", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.getValue(null);
+    		// WHEN
+    		accessor.getValue(null);
+		});
 	}
 
 	@Test
@@ -36,37 +33,41 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "privatePropertyWithMutator", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.setValue(null, null);
+    		// WHEN
+    		accessor.setValue(null, null);
+		});
 	}
 
 	@Test
 	public void onNullFieldNameShouldThrowException() {
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		new ReflectionFieldAccessor(Bean.class, null, String.class);
+    		// WHEN
+    		new ReflectionFieldAccessor(Bean.class, null, String.class);
+		});
 	}
 
 	@Test
 	public void onNullFieldTypeShouldThrowException() {
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		new ReflectionFieldAccessor(Bean.class, "a", null);
+    		// WHEN
+    		new ReflectionFieldAccessor(Bean.class, "a", null);
+		});
 	}
 
 	@Test
 	public void onNullResourceClassShouldThrowException() {
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		new ReflectionFieldAccessor(null, "a", String.class);
+    		// WHEN
+    		new ReflectionFieldAccessor(null, "a", String.class);
+		});
 	}
 
 	@Test
@@ -237,10 +238,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "nonExistingProperty", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.getValue(bean);
+    		// WHEN
+    		accessor.getValue(bean);
+		});
 	}
 
 	@Test
@@ -334,10 +336,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "uncheckedExceptionalField", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.getValue(bean);
+    		// WHEN
+    		accessor.getValue(bean);
+		});
 	}
 
 	@Test
@@ -347,10 +350,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "uncheckedExceptionalField", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.setValue(bean, "value");
+    		// WHEN
+    		accessor.setValue(bean, "value");
+		});
 	}
 
 	@Test
@@ -360,10 +364,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "checkedExceptionalField", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.getValue(bean);
+    		// WHEN
+    		accessor.getValue(bean);
+		});
 	}
 
 	@Test
@@ -373,10 +378,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "checkedExceptionalField", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.setValue(bean, "value");
+    		// WHEN
+    		accessor.setValue(bean, "value");
+		});
 	}
 
 	@Test
@@ -386,10 +392,11 @@ public class ReflectionFieldAccessorTest {
 		ReflectionFieldAccessor accessor = new ReflectionFieldAccessor(Bean.class, "attrThatDoesNotExist", String.class);
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		accessor.setValue(bean, "value");
+    		// WHEN
+    		accessor.setValue(bean, "value");
+		});
 	}
 
 	public static class Bean {

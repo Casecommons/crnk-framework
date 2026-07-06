@@ -40,7 +40,7 @@ dependencies {
 	compile files(('../../crnk-cdi/build/classes/main'))
 	compile 'javax:javaee-api:7.0'
 
-	compile 'org.slf4j:slf4j-api:1.7.13'
+	compile 'org.slf4j:slf4j-api:2.0.16'
 	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.7'
 
 	integrationTestCompile 'junit:junit:4.12'

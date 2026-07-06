@@ -28,7 +28,7 @@ Note that due to reliability issues of MavenCentral we only rarely publish there
 
 ## Requirements
 
-Crnk requires Java 1.8 or later and an SLF4J setup for logging.
+Crnk requires Java 21 or later and an SLF4J setup for logging.
 
 ## Example
 
@@ -62,7 +62,7 @@ dependencies {
 
     annotationProcessor 'io.crnk:crnk-gen-java'
 
-    implementation "io.crnk:crnk-setup-spring-boot2"
+    implementation "io.crnk:crnk-setup-spring-boot4"
     implementation "io.crnk:crnk-data-jpa"
     implementation "io.crnk:crnk-data-facet"
     implementation "io.crnk:crnk-format-plain-json"

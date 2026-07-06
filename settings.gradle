@@ -1,3 +1,7 @@
+plugins {
+	id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
 include ':crnk-core'
 include ':crnk-reactive'
 include ':crnk-home'
@@ -14,8 +18,7 @@ include ':crnk-security'
 include ':crnk-ui'
 
 include ':crnk-setup:crnk-setup-spring'
-include ':crnk-setup:crnk-setup-spring-boot1'
-include ':crnk-setup:crnk-setup-spring-boot2'
+include ':crnk-setup:crnk-setup-spring-boot4'
 include ':crnk-setup:crnk-setup-vertx'
 include ':crnk-setup:crnk-setup-servlet'
 include ':crnk-setup:crnk-setup-cdi'
@@ -47,8 +50,11 @@ include ':crnk-integration-examples:wildfly-example'
 include ':crnk-integration-examples:spring-boot-example'
 include ':crnk-integration-examples:spring-boot-minimal-example'
 include ':crnk-integration-examples:spring-boot-microservice-example'
-include ':crnk-integration-examples:dagger-vertx-example'
-include ':crnk-integration-examples:openliberty-microprofile-example'
+// Excluded from the Jakarta/Spring Boot 4 build: incompatible legacy stacks.
+// - dagger-vertx-example: Dagger 2.16 does not recognise jakarta.inject (would need Dagger 2.49+) and uses Vert.x 3.7
+// - openliberty-microprofile-example: MicroProfile/OpenLiberty stack not migrated to Jakarta
+// include ':crnk-integration-examples:dagger-vertx-example'
+// include ':crnk-integration-examples:openliberty-microprofile-example'
 
 gradle.beforeProject { Project project ->
     project.with {
@@ -81,5 +87,3 @@ gradle.beforeProject { Project project ->
         group = rootProject.group
     }
 }
-
-

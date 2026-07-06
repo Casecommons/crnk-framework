@@ -1,6 +1,6 @@
 package io.crnk.core.queryspec.pagingspec;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.dispatcher.RepositoryRequestSpec;
 import io.crnk.core.engine.information.resource.ResourceFieldType;
 import io.crnk.core.engine.information.resource.ResourceInformation;
@@ -13,18 +13,18 @@ import io.crnk.core.module.ModuleRegistry;
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.queryspec.internal.QuerySpecAdapter;
 import io.crnk.core.queryspec.mapper.DefaultQuerySpecUrlMapper;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PagingSpecUrlBuilderTest {
 
     @Mock
@@ -35,9 +35,9 @@ public class PagingSpecUrlBuilderTest {
 
     private ModuleRegistry moduleRegistry;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        when(resourceRegistry.getResourceUrl(any(QueryContext.class), any(ResourceInformation.class), any())).thenReturn("tasks");
+        when(resourceRegistry.getResourceUrl(any(QueryContext.class), org.mockito.ArgumentMatchers.nullable(ResourceInformation.class), any())).thenReturn("tasks");
         when(resourceRegistry.getEntry(any(Class.class))).thenReturn(mock(RegistryEntry.class));
         when(repositoryRequestSpec.getId()).thenReturn(1);
         when(repositoryRequestSpec.getRelationshipField()).thenReturn(
@@ -58,7 +58,7 @@ public class PagingSpecUrlBuilderTest {
         QuerySpecAdapter adapter = new QuerySpecAdapter(new QuerySpec(Task.class), resourceRegistry, queryContext);
 
         PagingSpecUrlBuilder urlBuilder = new PagingSpecUrlBuilder(moduleRegistry, repositoryRequestSpec);
-        Assert.assertEquals("tasks/relationships/any", urlBuilder.build(adapter));
+        Assertions.assertEquals("tasks/relationships/any", urlBuilder.build(adapter));
     }
 
     @Test
@@ -69,6 +69,6 @@ public class PagingSpecUrlBuilderTest {
         QuerySpecAdapter adapter = new QuerySpecAdapter(new QuerySpec(Task.class), resourceRegistry, queryContext);
 
         PagingSpecUrlBuilder urlBuilder = new PagingSpecUrlBuilder(moduleRegistry, repositoryRequestSpec);
-        Assert.assertEquals("tasks/any", urlBuilder.build(adapter));
+        Assertions.assertEquals("tasks/any", urlBuilder.build(adapter));
     }
 }

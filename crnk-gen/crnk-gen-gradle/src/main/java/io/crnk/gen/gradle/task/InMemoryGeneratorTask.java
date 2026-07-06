@@ -85,8 +85,8 @@ public class InMemoryGeneratorTask extends DefaultTask implements GeneratorTaskC
     private Object loadClass(ClassLoader classLoader, String name) {
         try {
             Class<?> clazz = classLoader.loadClass(name);
-            return clazz.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            return clazz.getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("failed to load class", e);
         }
     }

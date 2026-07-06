@@ -1,4 +1,7 @@
 package io.crnk.data.jpa.repository.querydsl;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.data.jpa.JpaEntityRepository;
@@ -10,11 +13,10 @@ import io.crnk.data.jpa.query.JpaQueryFactory;
 import io.crnk.data.jpa.query.querydsl.QuerydslQueryFactory;
 import io.crnk.data.jpa.query.querydsl.QuerydslRepositoryFilterBase;
 import io.crnk.data.jpa.query.querydsl.QuerydslTranslationContext;
-import org.junit.Test;
 import org.mockito.Mockito;
 
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 
 @Transactional
 public class QuerydslRepositoryFilterTest extends AbstractJpaTest {

@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.engine.document.Relationship;
 import io.crnk.core.engine.document.Resource;
 import io.crnk.core.engine.filter.FilterBehavior;
@@ -165,7 +165,11 @@ public class ResourceMapper {
 
 	protected void setAttribute(Resource resource, ResourceField field, Object value) {
 		if (isValueIncluded(field, value)) { // Quick decision
-			JsonNode valueNode = objectMapper.valueToTree(value);
+			// Jackson < 2.10 returned a Java null from valueToTree(null); since 2.10 it returns a NullNode.
+			// The framework historically stored that Java null as the attribute value (keeping the key but
+			// with a null JsonNode). Preserve that so callers observing a null attribute keep working, while
+			// the key still participates in attribute ordering.
+			JsonNode valueNode = value == null ? null : objectMapper.valueToTree(value);
 			if (isNodeIncluded(field, valueNode)) { //  take decision based on serialization
 				resource.getAttributes().put(field.getJsonName(), valueNode);
 			}

@@ -1,7 +1,7 @@
 package io.crnk.rs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
+import tools.jackson.databind.ObjectMapper;
+import java.util.List;
 import io.crnk.core.boot.CrnkBoot;
 import io.crnk.core.engine.information.InformationBuilder;
 import io.crnk.core.engine.information.repository.RepositoryAction;
@@ -22,19 +22,20 @@ import io.crnk.core.repository.ResourceRepository;
 import io.crnk.legacy.registry.DefaultResourceInformationProviderContext;
 import io.crnk.rs.internal.JaxrsModule;
 import io.crnk.test.mock.models.Task;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.SecurityContext;
 import java.util.Map;
 
 public class JaxrsModuleTest {
@@ -43,13 +44,13 @@ public class JaxrsModuleTest {
 
     private RepositoryInformationProviderContext context;
 
-    @Before
+    @BeforeEach
     public void setup() {
         final ModuleRegistry moduleRegistry = new ModuleRegistry();
         builder = new JaxrsModule.JaxrsResourceRepositoryInformationProvider();
         final ResourceInformationProvider resourceInformationProvider = new DefaultResourceInformationProvider(
                 moduleRegistry.getPropertiesProvider(),
-                ImmutableList.<PagingBehavior>of(new OffsetLimitPagingBehavior()),
+                List.<PagingBehavior>of(new OffsetLimitPagingBehavior()),
                 new DefaultResourceFieldInformationProvider(),
                 new JacksonResourceFieldInformationProvider());
         resourceInformationProvider
@@ -79,7 +80,7 @@ public class JaxrsModuleTest {
     public void testGetter() {
         SecurityContext securityContext = Mockito.mock(SecurityContext.class);
         JaxrsModule module = new JaxrsModule(securityContext);
-        Assert.assertEquals("jaxrs", module.getModuleName());
+        Assertions.assertEquals("jaxrs", module.getModuleName());
     }
 
     @Test
@@ -92,12 +93,12 @@ public class JaxrsModuleTest {
         boot.boot();
 
         SecurityProvider securityProvider = boot.getModuleRegistry().getSecurityProvider();
-        Assert.assertNotNull(securityProvider);
+        Assertions.assertNotNull(securityProvider);
 
         Mockito.when(securityContext.isUserInRole("admin")).thenReturn(true);
 
-        Assert.assertTrue(securityProvider.isUserInRole("admin", null));
-        Assert.assertFalse(securityProvider.isUserInRole("other", null));
+        Assertions.assertTrue(securityProvider.isUserInRole("admin", null));
+        Assertions.assertFalse(securityProvider.isUserInRole("other", null));
     }
 
     @Test
@@ -105,46 +106,58 @@ public class JaxrsModuleTest {
         ResourceRepositoryInformation information = (ResourceRepositoryInformation) builder.build(TaskRepository.class,
                 context);
         Map<String, RepositoryAction> actions = information.getActions();
-        Assert.assertEquals(5, actions.size());
+        Assertions.assertEquals(5, actions.size());
         RepositoryAction action = actions.get("repositoryAction");
-        Assert.assertNotNull(actions.get("repositoryPostAction"));
-        Assert.assertNotNull(actions.get("repositoryDeleteAction"));
-        Assert.assertNotNull(actions.get("repositoryPutAction"));
-        Assert.assertNull(actions.get("notAnAction"));
-        Assert.assertNotNull(action);
-        Assert.assertEquals("repositoryAction", action.getName());
-        Assert.assertEquals(RepositoryActionType.REPOSITORY, action.getActionType());
-        Assert.assertEquals(RepositoryActionType.RESOURCE, actions.get("resourceAction").getActionType());
+        Assertions.assertNotNull(actions.get("repositoryPostAction"));
+        Assertions.assertNotNull(actions.get("repositoryDeleteAction"));
+        Assertions.assertNotNull(actions.get("repositoryPutAction"));
+        Assertions.assertNull(actions.get("notAnAction"));
+        Assertions.assertNotNull(action);
+        Assertions.assertEquals("repositoryAction", action.getName());
+        Assertions.assertEquals(RepositoryActionType.REPOSITORY, action.getActionType());
+        Assertions.assertEquals(RepositoryActionType.RESOURCE, actions.get("resourceAction").getActionType());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testInvalidRootPathRepository() {
-        builder.build(InvalidRootPathRepository.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(InvalidRootPathRepository.class, context);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testInvalidIdPathRepository1() {
-        builder.build(InvalidIdPathRepository1.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(InvalidIdPathRepository1.class, context);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testInvalidIdPathRepository2() {
-        builder.build(InvalidIdPathRepository2.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(InvalidIdPathRepository2.class, context);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testPathToLongRepository() {
-        builder.build(PathToLongRepository.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(PathToLongRepository.class, context);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testMissingPathRepository1() {
-        builder.build(MissingPathRepository1.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(MissingPathRepository1.class, context);
+        });
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test
     public void testMissingPathRepository2() {
-        builder.build(MissingPathRepository2.class, context);
+        assertThrows(IllegalStateException.class, () -> {
+	        builder.build(MissingPathRepository2.class, context);
+        });
     }
 
     @Path("schedules")

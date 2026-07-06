@@ -1,7 +1,5 @@
 package io.crnk.core.queryspec.pagingspec;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.crnk.core.engine.internal.registry.ResourceRegistryImpl;
 import io.crnk.core.engine.query.QueryContext;
 import io.crnk.core.engine.registry.DefaultResourceRegistryPart;
@@ -15,19 +13,19 @@ import io.crnk.core.resource.links.PagedLinksInformation;
 import io.crnk.core.resource.list.DefaultResourceList;
 import io.crnk.core.resource.list.ResourceList;
 import io.crnk.core.resource.meta.DefaultPagedMetaInformation;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -48,7 +46,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(2, null), "tasks");
 
-		assertEquals(ImmutableSet.of("2"), result.get("page[number]"));
+		assertEquals(Set.of("2"), result.get("page[number]"));
 		assertFalse(result.containsKey("page[size]"));
 		assertEquals(1, result.size());
 	}
@@ -59,7 +57,7 @@ public class NumberSizePagingBehaviorTest {
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(1, 30), "tasks");
 
 		assertTrue(result.containsKey("page[number]"));
-		assertEquals(ImmutableSet.of("30"), result.get("page[size]"));
+		assertEquals(Set.of("30"), result.get("page[size]"));
 		assertEquals(2, result.size());
 	}
 
@@ -68,8 +66,8 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		Map<String, Set<String>> result = pagingBehavior.serialize(new NumberSizePagingSpec(1, 30), "tasks");
 
-		assertEquals(ImmutableSet.of("1"), result.get("page[number]"));
-		assertEquals(ImmutableSet.of("30"), result.get("page[size]"));
+		assertEquals(Set.of("1"), result.get("page[number]"));
+		assertEquals(Set.of("30"), result.get("page[size]"));
 		assertEquals(2, result.size());
 	}
 
@@ -85,7 +83,7 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserializeDefaultWithOffset() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("2")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("2")));
 
 		assertEquals(new NumberSizePagingSpec(2, null), result);
 	}
@@ -94,7 +92,7 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserializeDefaultWithLimit() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -113,7 +111,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultNumber(1);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("1")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("1")));
 
 		assertEquals(new NumberSizePagingSpec(1, null), result);
 	}
@@ -123,7 +121,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultNumber(1);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -142,7 +140,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultLimit(30L);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("1")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("1")));
 
 		assertEquals(new NumberSizePagingSpec(1, 30), result);
 	}
@@ -152,7 +150,7 @@ public class NumberSizePagingBehaviorTest {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		pagingBehavior.setDefaultLimit(30L);
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("size", ImmutableSet.of("10")));
+				pagingBehavior.deserialize(Map.of("size", Set.of("10")));
 
 		assertEquals(new NumberSizePagingSpec(1, 10), result);
 	}
@@ -161,8 +159,8 @@ public class NumberSizePagingBehaviorTest {
 	public void testDeserialize() {
 		NumberSizePagingBehavior pagingBehavior = new NumberSizePagingBehavior();
 		NumberSizePagingSpec result =
-				pagingBehavior.deserialize(ImmutableMap.of("number", ImmutableSet.of("2"),
-						"size", ImmutableSet.of("30")));
+				pagingBehavior.deserialize(Map.of("number", Set.of("2"),
+						"size", Set.of("30")));
 
 		assertEquals(new NumberSizePagingSpec(2, 30), result);
 	}
@@ -208,9 +206,9 @@ public class NumberSizePagingBehaviorTest {
 		PagedLinksInformation pagedLinksInformation = new DefaultPagedLinksInformation();
 		pagingBehavior.build(pagedLinksInformation, resourceList, querySpecAdapter, urlBuilder);
 
-		assertThat(pagedLinksInformation.getFirst().getHref(), equalTo("http://some.org"));
-		assertThat(pagedLinksInformation.getNext().getHref(), equalTo("http://some.org"));
+		assertEquals("http://some.org", pagedLinksInformation.getFirst().getHref());
+		assertEquals("http://some.org", pagedLinksInformation.getNext().getHref());
 		assertNull(pagedLinksInformation.getPrev());
-		assertThat(pagedLinksInformation.getLast().getHref(), equalTo("http://some.org"));
+		assertEquals("http://some.org", pagedLinksInformation.getLast().getHref());
 	}
 }

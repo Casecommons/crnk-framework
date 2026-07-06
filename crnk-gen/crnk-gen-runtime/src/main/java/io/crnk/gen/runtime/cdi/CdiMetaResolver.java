@@ -15,7 +15,7 @@ public class CdiMetaResolver implements RuntimeMetaResolver {
     public void run(RuntimeContext context, ClassLoader classLoader) {
         try {
             Class<?> runnerClass = classLoader.loadClass(CdiRunner.class.getName());
-            Object runner = runnerClass.newInstance();
+            Object runner = runnerClass.getConstructor().newInstance();
             Method method = runnerClass.getMethod("run", RuntimeContext.class);
             method.invoke(runner, context);
         } catch (Exception e) {

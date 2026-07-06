@@ -1,8 +1,8 @@
 package io.crnk.core.engine.internal.jackson;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
 import io.crnk.core.engine.information.bean.BeanAttributeInformation;
 import io.crnk.core.engine.information.bean.BeanInformation;
 import io.crnk.core.engine.information.resource.ResourceInformationProviderContext;
@@ -10,8 +10,8 @@ import io.crnk.core.engine.internal.information.resource.AnnotatedClassBuilder;
 import io.crnk.core.engine.internal.information.resource.AnnotatedFieldBuilder;
 import io.crnk.core.engine.internal.information.resource.AnnotatedMethodBuilder;
 import io.crnk.core.engine.internal.utils.CoreClassTestUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.lang.reflect.Field;
@@ -29,7 +29,7 @@ public class JacksonResourceFieldInformationProviderNamingTest {
 
 	private BeanInformation beanDesc;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		objectMapper = new ObjectMapper();
 
@@ -106,7 +106,8 @@ public class JacksonResourceFieldInformationProviderNamingTest {
 
 	@Test
 	public void onMethodNameWithNamingStrategyShouldReturnModifiedName() throws Exception {
-		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+		objectMapper = objectMapper.rebuild().propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).build();
+		Mockito.when(context.getObjectMapper()).thenReturn(objectMapper);
 		sut = new JacksonResourceFieldInformationProvider();
 		sut.init(context);
 		Method method = TestClass.class.getDeclaredMethod("getAccessorField");
@@ -119,7 +120,8 @@ public class JacksonResourceFieldInformationProviderNamingTest {
 
 	@Test
 	public void onFieldNameWithNamingStrategyShouldReturnModifiedName() throws Exception {
-		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+		objectMapper = objectMapper.rebuild().propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).build();
+		Mockito.when(context.getObjectMapper()).thenReturn(objectMapper);
 		sut = new JacksonResourceFieldInformationProvider();
 		sut.init(context);
 		Field field = TestClass.class.getDeclaredField("namingStrategyTest");

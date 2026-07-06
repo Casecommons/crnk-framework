@@ -1,10 +1,9 @@
 package io.crnk.core.engine.internal.http;
 
-import java.io.IOException;
 import java.util.Arrays;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.boot.CrnkProperties;
 import io.crnk.core.engine.dispatcher.Response;
 import io.crnk.core.engine.document.Document;
@@ -41,7 +40,7 @@ public class JsonApiRequestProcessorBase {
 		return acceptingPlainJson;
 	}
 
-	protected HttpResponse getErrorResponse(JsonProcessingException e) {
+	protected HttpResponse getErrorResponse(JacksonException e) {
 		final String message = "Json Parsing failed";
 		Response response = buildBadRequestResponse(message, e.getMessage());
 		logger.error(message, e);
@@ -68,19 +67,11 @@ public class JsonApiRequestProcessorBase {
 		return HttpHeaders.JSONAPI_CONTENT_TYPE_AND_CHARSET;
 	}
 
-	protected Document getRequestDocument(HttpRequestContext requestContext) throws JsonProcessingException {
+	protected Document getRequestDocument(HttpRequestContext requestContext) throws JacksonException {
 		byte[] requestBody = requestContext.getRequestBody();
 		if (requestBody != null && requestBody.length > 0) {
 			ObjectMapper objectMapper = moduleContext.getObjectMapper();
-			try {
-				return objectMapper.readerFor(Document.class).readValue(requestBody);
-			}
-			catch (JsonProcessingException e) {
-				throw e;
-			}
-			catch (IOException e) {
-				throw new IllegalStateException(e);
-			}
+			return objectMapper.readerFor(Document.class).readValue(requestBody);
 		}
 		return null;
 	}

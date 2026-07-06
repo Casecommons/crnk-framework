@@ -4,11 +4,14 @@ import io.crnk.core.engine.information.resource.ResourceField;
 import io.crnk.core.engine.information.resource.ResourceFieldType;
 import io.crnk.core.engine.internal.information.resource.ResourceFieldImpl;
 import io.crnk.core.engine.internal.utils.FieldOrderedComparator;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 import java.util.TreeSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +20,7 @@ public class FieldOrderedComparatorTest {
 	ResourceField fieldA;
 	ResourceField fieldB;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		fieldA = new ResourceFieldImpl("a", "a", ResourceFieldType.ATTRIBUTE, String.class, String.class, null);
 		fieldB = new ResourceFieldImpl("b", "b", ResourceFieldType.ATTRIBUTE, String.class, String.class, null);
@@ -35,7 +38,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldB);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -50,7 +53,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldB);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -63,7 +66,7 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldA);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldB, fieldA);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldB, fieldA);
 	}
 
 	@Test
@@ -76,6 +79,6 @@ public class FieldOrderedComparatorTest {
 		fields.add(fieldA);
 
 		// THEN
-		assertThat(fields).containsSequence(fieldA, fieldB);
+		assertThat(new ArrayList<>(fields)).containsExactly(fieldA, fieldB);
 	}
 }

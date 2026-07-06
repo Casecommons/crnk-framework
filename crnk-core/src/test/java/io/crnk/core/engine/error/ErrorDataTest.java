@@ -2,7 +2,7 @@ package io.crnk.core.engine.error;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.ErrorDataBuilder;
 import io.crnk.core.engine.internal.document.mapper.DocumentMapperUtil;
@@ -10,28 +10,30 @@ import io.crnk.core.engine.internal.jackson.JacksonModule;
 import io.crnk.core.engine.internal.utils.JsonApiUrlBuilder;
 import io.crnk.core.engine.properties.NullPropertiesProvider;
 import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ErrorDataTest {
 
 	protected DocumentMapperUtil util;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		util = new DocumentMapperUtil(null, null, new NullPropertiesProvider(), new JsonApiUrlBuilder(null));
 	}
 
 	@Test
 	public void shouldFulfillEqualsHashCodeContract() {
-		EqualsVerifier.forClass(ErrorData.class).allFieldsShouldBeUsed().verify();
+		EqualsVerifier.forClass(ErrorData.class).suppress(Warning.NONFINAL_FIELDS).verify();
 	}
 
 	@Test
 	public void testSerialization() throws IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(JacksonModule.createJacksonModule());
+		ObjectMapper mapper = tools.jackson.databind.json.JsonMapper.builder()
+				.addModule(JacksonModule.createJacksonModule())
+				.build();
 
 		ErrorDataBuilder builder = new ErrorDataBuilder();
 		builder.setAboutLink("about");
@@ -47,14 +49,14 @@ public class ErrorDataTest {
 		ErrorData errorData = builder.build();
 		String json = mapper.writeValueAsString(errorData);
 
-		Assert.assertTrue(json.contains("\"parameter\":\"sourceParameter\""));
-		Assert.assertTrue(json.contains("\"pointer\":\"sourcePointer\""));
-		Assert.assertTrue(json.contains("\"meta\":{\"meta1\":\"value1\"}"));
-		Assert.assertTrue(json.contains("\"links\":{\"about\":\"about\"}"));
+		Assertions.assertTrue(json.contains("\"parameter\":\"sourceParameter\""));
+		Assertions.assertTrue(json.contains("\"pointer\":\"sourcePointer\""));
+		Assertions.assertTrue(json.contains("\"meta\":{\"meta1\":\"value1\"}"));
+		Assertions.assertTrue(json.contains("\"links\":{\"about\":\"about\"}"));
 
 		ErrorData copy = mapper.readerFor(ErrorData.class).readValue(json);
 
-		Assert.assertEquals(errorData, copy);
+		Assertions.assertEquals(errorData, copy);
 	}
 
 	@Test
@@ -67,7 +69,7 @@ public class ErrorDataTest {
 		builder.setSourcePointer("sourcePointer");
 		builder.setSourceParameter("sourceParameter");
 		String actual = builder.build().toString();
-		Assert.assertEquals(
+		Assertions.assertEquals(
 				"ErrorData{id='null', aboutLink='null', status='status', code='code', title='title', detail='detail', "
 						+ "sourcePointer='sourcePointer', sourceParameter='sourceParameter', meta=null}",
 				actual);

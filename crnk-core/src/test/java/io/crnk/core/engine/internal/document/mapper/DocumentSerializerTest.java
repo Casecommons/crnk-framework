@@ -1,10 +1,10 @@
 package io.crnk.core.engine.internal.document.mapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.CoreTestContainer;
 import io.crnk.core.CoreTestModule;
 import io.crnk.core.engine.document.Document;
@@ -13,9 +13,9 @@ import io.crnk.core.engine.document.Relationship;
 import io.crnk.core.engine.document.Resource;
 import io.crnk.core.engine.document.ResourceIdentifier;
 import io.crnk.core.utils.Nullable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -30,14 +30,15 @@ public class DocumentSerializerTest {
 
 	private ObjectWriter writer;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		CoreTestContainer container = new CoreTestContainer();
 		container.addModule(new CoreTestModule());
 		container.boot();
 
-		objectMapper = container.getObjectMapper();
-		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+		objectMapper = container.getObjectMapper().rebuild()
+				.enable(SerializationFeature.INDENT_OUTPUT)
+				.build();
 
 		reader = objectMapper.reader().forType(Document.class);
 		writer = objectMapper.writer();
@@ -69,7 +70,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString());
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -87,7 +88,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString());
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -107,7 +108,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString().replace('\'', '\"'));
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -131,7 +132,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString().replace('\'', '\"'));
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -168,8 +169,8 @@ public class DocumentSerializerTest {
 
 		Document readDoc = reader.readValue(json);
 		Relationship readRelationship = readDoc.getSingleData().get().getRelationships().get("project");
-		Assert.assertEquals(relationship, readRelationship);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(relationship, readRelationship);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -204,8 +205,8 @@ public class DocumentSerializerTest {
 
 		Document readDoc = reader.readValue(json);
 		Relationship readRelationship = readDoc.getSingleData().get().getRelationships().get("project");
-		Assert.assertEquals(relationship, readRelationship);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(relationship, readRelationship);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -241,8 +242,8 @@ public class DocumentSerializerTest {
 
 		Document readDoc = reader.readValue(json);
 		Relationship readRelationship = readDoc.getSingleData().get().getRelationships().get("project");
-		Assert.assertEquals(relationship, readRelationship);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(relationship, readRelationship);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -268,7 +269,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString().replace('\'', '\"'));
 
 		Relationship readRelationship = objectMapper.reader().forType(Relationship.class).readValue(json);
-		Assert.assertEquals(relationship, readRelationship);
+		Assertions.assertEquals(relationship, readRelationship);
 	}
 
 	@Test
@@ -314,7 +315,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString());
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 	@Test
@@ -360,7 +361,7 @@ public class DocumentSerializerTest {
 		assertThatJson(json).describedAs(expected.toString());
 
 		Document readDoc = reader.readValue(json);
-		Assert.assertEquals(doc, readDoc);
+		Assertions.assertEquals(doc, readDoc);
 	}
 
 }

@@ -1,22 +1,21 @@
 package io.crnk.format.plainjson.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.NullNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.engine.document.ErrorData;
 import io.crnk.core.engine.document.Relationship;
 import io.crnk.core.engine.document.Resource;
@@ -27,18 +26,15 @@ import io.crnk.core.utils.Nullable;
 /**
  * Serializes top-level Errors object.
  */
-public class PlainJsonDocumentDeserializer extends JsonDeserializer<PlainJsonDocument> {
+public class PlainJsonDocumentDeserializer extends ValueDeserializer<PlainJsonDocument> {
 
 	private static final List<String> SYSTEM_FIELDS = Arrays.asList("id", "type", "meta", "links");
 
-	private ObjectMapper objectMapper;
-
-	public PlainJsonDocumentDeserializer(ObjectMapper objectMapper) {
-		this.objectMapper = objectMapper;
+	public PlainJsonDocumentDeserializer() {
 	}
 
 	@Override
-	public PlainJsonDocument deserialize(JsonParser jp, DeserializationContext context) throws IOException {
+	public PlainJsonDocument deserialize(JsonParser jp, DeserializationContext context) throws JacksonException {
 		JsonNode documentNode = jp.readValueAsTree();
 
 		PlainJsonDocument document = new PlainJsonDocument();
@@ -48,10 +44,9 @@ public class PlainJsonDocumentDeserializer extends JsonDeserializer<PlainJsonDoc
 
 		ArrayNode errors = (ArrayNode) documentNode.get("errors");
 		if (errors != null) {
-			ObjectReader errorReader = objectMapper.readerFor(ErrorData.class);
 			List<ErrorData> errorDataList = new ArrayList<>();
 			for (JsonNode error : errors) {
-				ErrorData errorData = errorReader.readValue(error);
+				ErrorData errorData = context.readTreeAsValue(error, ErrorData.class);
 				errorDataList.add(errorData);
 			}
 			document.setErrors(errorDataList);
@@ -94,9 +89,8 @@ public class PlainJsonDocumentDeserializer extends JsonDeserializer<PlainJsonDoc
 		resource.setMeta((ObjectNode) data.get("meta"));
 		resource.setLinks((ObjectNode) data.get("links"));
 
-		Iterator<Map.Entry<String, JsonNode>> fields = data.fields();
-		while (fields.hasNext()) {
-			Map.Entry<String, JsonNode> entry = fields.next();
+		Set<Map.Entry<String, JsonNode>> fields = data.properties();
+		for (Map.Entry<String, JsonNode> entry : fields) {
 			String fieldName = entry.getKey();
 			if (!SYSTEM_FIELDS.contains(fieldName)) {
 				JsonNode fieldValue = entry.getValue();
@@ -148,9 +142,8 @@ public class PlainJsonDocumentDeserializer extends JsonDeserializer<PlainJsonDoc
 	}
 
 	private boolean isResource(JsonNode elementNode) {
-		Iterator<String> iterator = elementNode.fieldNames();
-		while (iterator.hasNext()) {
-			String fieldName = iterator.next();
+		Collection<String> propertyNames = elementNode.propertyNames();
+		for (String fieldName : propertyNames) {
 			if (!SYSTEM_FIELDS.contains(fieldName)) {
 				return true;
 			}

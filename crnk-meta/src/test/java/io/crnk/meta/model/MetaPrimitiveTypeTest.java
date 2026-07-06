@@ -3,15 +3,15 @@ package io.crnk.meta.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.resource.annotations.JsonApiId;
 import io.crnk.core.resource.annotations.JsonApiResource;
 import io.crnk.meta.AbstractMetaTest;
 import io.crnk.meta.MetaLookup;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class MetaPrimitiveTypeTest extends AbstractMetaTest {
 
@@ -20,22 +20,22 @@ public class MetaPrimitiveTypeTest extends AbstractMetaTest {
 	@Test
 	public void testJson() {
 		MetaElement type = resourceProvider.getMeta(JsonNode.class);
-		Assert.assertEquals(MetaPrimitiveType.class, type.getClass());
-		Assert.assertEquals("base.json", type.getId());
+		Assertions.assertEquals(MetaPrimitiveType.class, type.getClass());
+		Assertions.assertEquals("base.json", type.getId());
 	}
 
 	@Test
 	public void testJsonObject() {
 		MetaElement type = resourceProvider.getMeta(ObjectNode.class);
-		Assert.assertEquals(MetaPrimitiveType.class, type.getClass());
-		Assert.assertEquals("base.json.object", type.getId());
+		Assertions.assertEquals(MetaPrimitiveType.class, type.getClass());
+		Assertions.assertEquals("base.json.object", type.getId());
 	}
 
 	@Test
 	public void testJsonArray() {
 		MetaElement type = resourceProvider.getMeta(ArrayNode.class);
-		Assert.assertEquals(MetaPrimitiveType.class, type.getClass());
-		Assert.assertEquals("base.json.array", type.getId());
+		Assertions.assertEquals(MetaPrimitiveType.class, type.getClass());
+		Assertions.assertEquals("base.json.array", type.getId());
 	}
 
 

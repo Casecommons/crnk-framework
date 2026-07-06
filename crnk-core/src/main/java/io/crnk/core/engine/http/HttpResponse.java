@@ -1,12 +1,12 @@
 package io.crnk.core.engine.http;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
 
-    private Map<String, String> headers = new HashMap();
+    private Map<String, String> headers = new HashMap<>();
 
     private int statusCode;
 
@@ -55,7 +55,7 @@ public class HttpResponse {
     }
 
     public void setBody(String body) {
-        this.body = body.getBytes(Charset.forName("utf8"));
+        this.body = body.getBytes(StandardCharsets.UTF_8);
     }
 
     public String getHeader(String name) {

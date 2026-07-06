@@ -4,11 +4,12 @@ import io.crnk.core.mock.models.Project;
 import io.crnk.core.mock.models.Task;
 import io.crnk.core.queryspec.QuerySpec;
 import io.crnk.core.resource.list.ResourceList;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.Collection;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RelationshipRepositoryV2Test {
 
@@ -113,15 +114,17 @@ public class RelationshipRepositoryV2Test {
 	public void getMatcherForUntyped() {
 		RelationshipMatcher matcher = untypedRepo.getMatcher();
 
-		Assert.assertEquals(1, matcher.rules.size());
+		Assertions.assertEquals(1, matcher.rules.size());
 		RelationshipMatcherRule rule = matcher.rules.get(0);
-		Assert.assertEquals("tasks", rule.sourceResourceType);
-		Assert.assertEquals("projects", rule.targetResourceType);
+		Assertions.assertEquals("tasks", rule.sourceResourceType);
+		Assertions.assertEquals("projects", rule.targetResourceType);
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void getMatcherThrowsExceptionWithoutTypes() {
-		nullRepo.getMatcher();
+	    assertThrows(IllegalStateException.class, () -> {
+    		nullRepo.getMatcher();
+	    });
 	}
 
 }

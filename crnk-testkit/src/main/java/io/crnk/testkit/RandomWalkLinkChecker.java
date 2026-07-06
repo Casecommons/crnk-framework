@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.client.http.HttpAdapter;
 import io.crnk.client.http.HttpAdapterRequest;
 import io.crnk.client.http.HttpAdapterResponse;
@@ -170,9 +170,7 @@ public class RandomWalkLinkChecker {
 			}
 		} else if (jsonNode instanceof ObjectNode) {
 			ObjectNode objectNode = (ObjectNode) jsonNode;
-			Iterator<Map.Entry<String, JsonNode>> fields = objectNode.fields();
-			while (fields.hasNext()) {
-				Map.Entry<String, JsonNode> entry = fields.next();
+			for (Map.Entry<String, JsonNode> entry : objectNode.properties()) {
 				String name = entry.getKey();
 				if (name.equals("links")) {
 					JsonNode linksValue = entry.getValue();
@@ -188,9 +186,7 @@ public class RandomWalkLinkChecker {
 	}
 
 	protected void collectLinks(ObjectNode linksNode) {
-		Iterator<Map.Entry<String, JsonNode>> iterator = linksNode.fields();
-		while (iterator.hasNext()) {
-			Map.Entry<String, JsonNode> entry = iterator.next();
+		for (Map.Entry<String, JsonNode> entry : linksNode.properties()) {
 			JsonNode link = entry.getValue();
 			String url = link.asText();
 			if (url != null && url.startsWith("http") && !visited.contains(url)) {

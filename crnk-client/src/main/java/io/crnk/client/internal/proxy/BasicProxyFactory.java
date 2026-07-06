@@ -1,6 +1,6 @@
 package io.crnk.client.internal.proxy;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 import io.crnk.core.engine.information.resource.ResourceInformation;
 import io.crnk.core.engine.internal.utils.ClassUtils;
 import io.crnk.core.engine.internal.utils.WrappedList;
@@ -65,7 +65,7 @@ public class BasicProxyFactory implements ClientProxyFactory {
             Collection lazyCollection = (Collection) constructor.newInstance(handler);
             boolean isCustomClass = WrappedList.class.isAssignableFrom(collectionClass);
             if (isCustomClass) {
-                WrappedList collectionImpl = (WrappedList) collectionClass.newInstance();
+                WrappedList collectionImpl = (WrappedList) collectionClass.getConstructor().newInstance();
                 collectionImpl.setWrappedList((List) lazyCollection);
                 return (C) collectionImpl;
             } else {

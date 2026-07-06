@@ -6,7 +6,7 @@ import io.crnk.core.engine.internal.utils.ClassUtils;
 
 public class HttpClientAdapterProvider implements HttpAdapterProvider {
 
-	private static final String APACHE_HTTP_CLIENT_DETECTION_CLASS = "org.apache.http.impl.client.CloseableHttpClient";
+	private static final String APACHE_HTTP_CLIENT_DETECTION_CLASS = "org.apache.hc.client5.http.impl.classic.CloseableHttpClient";
 
 	@Override
 	public boolean isAvailable() {

@@ -8,20 +8,16 @@ import io.crnk.core.engine.internal.dispatcher.path.PathBuilder;
 import io.crnk.core.engine.query.QueryContext;
 import io.crnk.core.engine.registry.ResourceRegistry;
 import io.crnk.core.exception.BadRequestException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ControllerRegistryTest {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
     private ResourceRegistry resourceRegistry;
     private PathBuilder pathBuilder;
     private QueryContext queryContext = new QueryContext().setRequestVersion(0);
 
-    @Before
+    @BeforeEach
     public void prepare() {
         CoreTestContainer container = new CoreTestContainer();
         container.addModule(new CoreTestModule());
@@ -38,9 +34,10 @@ public class ControllerRegistryTest {
         ControllerRegistry sut = new ControllerRegistry(null);
 
         // THEN
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        // WHEN
-        sut.getController(jsonPath, requestType);
+            // WHEN
+            sut.getController(jsonPath, requestType);
+        });
     }
 }

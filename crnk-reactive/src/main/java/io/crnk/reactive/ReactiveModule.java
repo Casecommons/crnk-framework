@@ -13,7 +13,8 @@ import reactor.core.scheduler.Schedulers;
 
 public class ReactiveModule implements Module {
 
-	private Scheduler workerScheduler = Schedulers.elastic();
+	// Reactor 3.5 removed Schedulers.elastic(); boundedElastic() is the documented replacement.
+	private Scheduler workerScheduler = Schedulers.boundedElastic();
 
 
 	@Override

@@ -67,8 +67,18 @@ public class BraveClientModule implements Module, HttpAdapterAware {
 						"io.crnk.monitor.brave.internal.HttpClientBraveIntegration"
 				);
 				Constructor constructor = integrationClass.getConstructor(HttpTracing.class);
-				HttpClientAdapterListener listener = (HttpClientAdapterListener) constructor.newInstance(tracing);
-				httpClientAdapter.addListener(listener);
+				Object integration = constructor.newInstance(tracing);
+				httpClientAdapter.addListener((HttpClientAdapterListener) integration);
+				// Set the custom build function that lets Brave add tracing interceptors
+				java.lang.reflect.Method buildClientMethod = integrationClass.getMethod("buildClient",
+						org.apache.hc.client5.http.impl.classic.HttpClientBuilder.class);
+				httpClientAdapter.setClientBuilder(builder -> {
+					try {
+						return (org.apache.hc.client5.http.impl.classic.CloseableHttpClient) buildClientMethod.invoke(integration, builder);
+					} catch (Exception e) {
+						throw new IllegalStateException("failed to build traced HttpClient", e);
+					}
+				});
 			} else {
 				throw new IllegalArgumentException(adapter.getClass() + " not supported yet");
 			}

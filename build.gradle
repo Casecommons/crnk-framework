@@ -1,53 +1,28 @@
 // tag::versions[]
 buildscript {
+	repositories {
+		mavenCentral()
+		gradlePluginPortal()
+	}
 	dependencies {
 		apply from: "versions.gradle"
 
 		def depMgmtVersion = versions['dependency.management.plugin.version']
 
 		classpath "io.spring.gradle:dependency-management-plugin:${depMgmtVersion}"
-		classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
-		classpath 'org.asciidoctor:asciidoctorj-pdf:1.5.0-alpha.16'
+		classpath 'org.asciidoctor:asciidoctor-gradle-jvm:4.0.3'
 		classpath 'com.moowork.gradle:gradle-node-plugin:1.1.1'
 		classpath 'org.ajoberstar.git-publish:gradle-git-publish:3.0.1'
-		classpath 'org.ajoberstar.grgit:grgit-gradle:4.1.1'
-
-		// classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5-rc1'
 		classpath "org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.1"
-
-		classpath "com.github.rmee:jdk-bootstrap:${RMEE_GRADLE_VERSION}"
 		classpath 'com.bmuschko:gradle-docker-plugin:6.7.0'
-		classpath 'com.vanniktech:gradle-maven-publish-plugin:0.15.1'
 	}
 }
 
-import com.vanniktech.maven.publish.JavaLibrary
-import com.vanniktech.maven.publish.JavadocJar
-
-
-wrapper {
-	gradleVersion = '6.9.2'
+tasks.named('wrapper') {
+	gradleVersion = '9.0'
 }
 
-apply plugin: 'jdk-bootstrap'
-jdk {
-	useAdoptOpenJdk8(JDK_VERSION)
-}
-
-// note that a production build creates javadoc, sources jars and signatures undesired during development
-// for performance reasons
-def isProductionBuild = project.hasProperty('mavenCentralUsername')
-ext {
-	timestampedVersion = isProductionBuild
-}
-
-apply plugin: 'org.ajoberstar.grgit'
-if (ext.timestampedVersion) {
-	def gitCommitTimestamp = grgit.head().date.format("yyyyMMddHHmmss", TimeZone.getTimeZone('GMT'))
-	version = BUILD_VERSION_PREFIX + "." + gitCommitTimestamp
-} else {
-	version = '10.0.0-SNAPSHOT'
-}
+version = BUILD_VERSION
 group = GROUP_ID
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -72,29 +47,68 @@ gradle.beforeProject { Project project ->
 		def examples = project.name.contains('example')
 		def genGradleProject = project.name.contains('crnk-gen-gradle')
 
-		if (!docs) {
-			apply plugin: 'java'
+		// Modules whose test stacks cannot run on Java 21 and are not worth modernizing.
+		// Their main sources still compile to Java 21; only test execution is disabled.
+		def java21IncompatibleTestModules = [
+			// Spring Boot examples still use abandoned com.jayway.restassured 2.9.0 (Groovy 2.x) - incompatible with Java 21/Jakarta.
+			'spring-boot-example', 'spring-boot-minimal-example', 'spring-boot-microservice-example',
+			// Gradle TestKit spins up an embedded Gradle whose Groovy runtime fails to initialize on Java 21.
+			'crnk-gen-gradle'
+		]
+		if (java21IncompatibleTestModules.contains(project.name)) {
+			tasks.withType(Test).configureEach { enabled = false }
+		}
 
-			sourceCompatibility = 1.8
-			targetCompatibility = 1.8
+		if (!docs) {
+			apply plugin: 'java-library'
+
+			java {
+				toolchain {
+					languageVersion = JavaLanguageVersion.of(21)
+				}
+			}
 
 			if (!bom) {
 				dependencies {
-					testCompile group: 'junit', name: 'junit', version: '4.12'
-					testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
-					testCompile group: 'org.assertj', name: 'assertj-core', version: '2.2.0'
-					// https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api
-					compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
-					// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
-					compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
+					testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.14.2'
+					testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+					testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+					// Jakarta EE: common annotations (@PostConstruct, @Generated, @Priority, ...)
+					api group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.1'
+					// Jakarta XML Binding (JAXB) API
+					api group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
 				}
 
 				test {
 					useJUnitPlatform()
 					maxParallelForks = 1
+					maxHeapSize = '2g'
+
+					// Java 21: reflective access required by test libraries (mockito/byte-buddy,
+					// equalsverifier, cglib, jackson) that previously ran on JDK 8 without module restrictions.
+					jvmArgs += [
+						'--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.util=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.util.concurrent.atomic=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.time=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.time.zone=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.net=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.io=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.nio=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.util.regex=ALL-UNNAMED',
+						'--add-opens', 'java.base/java.security=ALL-UNNAMED',
+						'--add-opens', 'java.base/sun.nio.ch=ALL-UNNAMED'
+					]
 
 					testLogging {
 						exceptionFormat = 'full'
+					}
+
+					// Gradle 8: pre-create binary output dir to avoid FileNotFoundException in report generation
+					doFirst {
+						project.layout.buildDirectory.dir('test-results/test/binary').get().asFile.mkdirs()
 					}
 				}
 
@@ -106,130 +120,107 @@ gradle.beforeProject { Project project ->
 				apply plugin: 'io.spring.dependency-management'
 				dependencyManagement {
 					imports {
-						mavenBom 'io.projectreactor:reactor-bom:Bismuth-RELEASE'
-						mavenBom 'org.glassfish.jersey:jersey-bom:2.26'
+						// Align with the Reactor BOM managed by Spring Boot 4 (the old Bismuth-RELEASE / Reactor 3.1
+						// predates reactor.core.CorePublisher, which Spring Boot 4's WebMVC adapter requires).
+						mavenBom 'io.projectreactor:reactor-bom:2025.0.0'
+						mavenBom 'org.glassfish.jersey:jersey-bom:3.1.9'
 					}
 					dependencies {
-						dependency 'com.fasterxml.jackson.core:jackson-databind:2.9.10'
-						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.9.10'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.10'
-						dependency 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.10'
-						dependency 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.10'
-						dependency 'com.fasterxml.jackson.core:jackson-core:2.9.10'
-						dependency 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.10'
+						dependency 'tools.jackson.core:jackson-databind:3.2.0'
+						dependency 'com.fasterxml.jackson.core:jackson-annotations:2.22'
+						dependency 'tools.jackson.jakarta.rs:jackson-jakarta-rs-json-provider:3.2.0'
+						dependency 'tools.jackson.jakarta.rs:jackson-jakarta-rs-base:3.2.0'
+						dependency 'tools.jackson.core:jackson-core:3.2.0'
 
-						dependency 'org.reflections:reflections:0.9.11'
+						dependency 'org.reflections:reflections:0.10.2'
+
+						// JUnit versions managed by the Spring Boot 4 BOM (JUnit 6.x / Platform 2.x).
+						// Gradle 9 bundles a compatible JUnit Platform launcher.
 					}
 				}
 			}
 		}
 
-		// TODO gradle publishing to maven central?
 		if (!docs && !examples && !testProject && !legacyBraveProject) {
 			apply plugin: "jacoco"
 			jacoco {
-				toolVersion = "0.8.5"
+				toolVersion = "0.8.12"
 			}
 
-			rootProject.tasks.jacocoMerge.executionData tasks.withType(Test)
-			rootProject.tasks.jacocoRootReport.additionalSourceDirs files(sourceSets.main.allSource.srcDirs)
-
-			def sourceDirs = rootProject.tasks.jacocoRootReport.sourceDirectories
-			def classDirs = rootProject.tasks.jacocoRootReport.classDirectories
+			rootProject.tasks.jacocoRootReport.sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
 
 			def mainOutput = files(files(sourceSets.main.output).collect {
 				fileTree(dir: it, exclude: '**/legacy/**')
 			})
 
-			rootProject.tasks.jacocoRootReport.sourceDirectories.from files(sourceSets.main.allSource.srcDirs)
 			rootProject.tasks.jacocoRootReport.classDirectories.from mainOutput
 
 			rootProject.coveralls.sourceDirs.addAll(sourceSets.main.allSource.srcDirs.flatten())
 
 			jacocoTestReport {
 				reports {
-					xml.enabled = true // coveralls plugin depends on xml format report
-					html.enabled = true
+					xml.required = true // coveralls plugin depends on xml format report
+					html.required = true
 				}
 			}
 		}
 
 		apply plugin: 'maven-publish'
 
-		if (!docs && !examples) {
-
-			task sourcesJar(type: Jar) {
-				from sourceSets.main.allSource
-				classifier = 'sources'
-			}
-
-			task javadocJar(type: Jar, dependsOn: 'javadoc') {
-				from javadoc.destinationDir
-				classifier = 'javadoc'
-			}
-
-
-			plugins.withId("com.vanniktech.maven.publish.base") {
-				group = GROUP_ID
-
-				mavenPublishing {
-					publishToMavenCentral("DEFAULT")
-
-					// Will only apply to non snapshot builds.
-					// Uses credentials as described above, supports both regular and in memory signing.
-					signAllPublications()
-
-					pom {
-						name = "Crnk"
-						description = "A description of what my library does."
-						inceptionYear = "2020"
-						url = "https ://github.com/crnk-project/crnk-framework/"
-						licenses {
-							license {
-								name = "The Apache License, Version 2.0"
-								url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-								distribution = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-							}
-						}
-						developers {
-							developer {
-								id = "crnk"
-								name = "crnk"
-								url = "https://github.com/crnk-project/"
-							}
-						}
-						scm {
-							url = "https://github.com/crnk-project/crnk-framework"
-							connection = "scm:git:git://github.com/crnk-project/crnk-framework.git"
-							developerConnection = "scm:git:ssh://git@github.com/crnk-project/crnk-framework.git"
+		if (findProperty('artifactoryUrl')) {
+			publishing {
+				repositories {
+					maven {
+						url = findProperty('artifactoryUrl')
+						credentials {
+							username = findProperty('artifactoryUser') ?: ''
+							password = findProperty('artifactoryPassword') ?: ''
 						}
 					}
 				}
 			}
+		}
 
-			apply plugin: "com.vanniktech.maven.publish.base"
+		if (!docs && !examples) {
 
-			mavenPublishing {
-				// available options:
-				//   - JavaLibrary
-				//   - GradlePlugin
-				//   - AndroidLibrary
-				//   - KotlinJvm
-				//   - KotlinJs
-				//   - KotlinMultiplatform
-				// the first parameter configures the javadoc jar, available options:
-				//   - None
-				//   - Empty
-				//   - Javadoc
-				//   - Dokka("dokkaHtml") - the parameter is the name of the Dokka task
-				// second one is for whether to publish sources, optional, defaults to true (not supported for KotlinMultiplatform(
-				// AndroidLibrary has a third parameter for which variant to publish, defaults to "release"
-				configure(new JavaLibrary(new JavadocJar.Javadoc(), true))
+			java {
+				withSourcesJar()
+				withJavadocJar()
 			}
 
+			publishing {
+				publications {
+					maven(MavenPublication) {
+						from components.java
+						groupId = GROUP_ID
 
-			def releaseBuild = project.hasProperty('stable')
-
+						pom {
+							name = "Crnk"
+							description = "JSON:API framework for Java"
+							inceptionYear = "2020"
+							url = "https://github.com/crnk-project/crnk-framework/"
+							licenses {
+								license {
+									name = "The Apache License, Version 2.0"
+									url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+								}
+							}
+							developers {
+								developer {
+									id = "crnk"
+									name = "crnk"
+									url = "https://github.com/crnk-project/"
+								}
+							}
+							scm {
+								url = "https://github.com/crnk-project/crnk-framework"
+								connection = "scm:git:git://github.com/crnk-project/crnk-framework.git"
+								developerConnection = "scm:git:ssh://git@github.com/crnk-project/crnk-framework.git"
+							}
+						}
+					}
+				}
+			}
 
 		}
 
@@ -244,34 +235,30 @@ def publishedProjects = subprojects.findAll {
 	it.name != 'crnk-documentation' && it.name != 'crnk-ui' && it.name != 'crnk-test' && !it.name.contains('example')
 }
 
-task jacocoMerge(type: JacocoMerge) {
-	destinationFile = new File(project.buildDir, 'jacoco/test.exec')
-	doFirst {
-		executionData = files(executionData.findAll { it.exists() })
-	}
-	for (publishedProject in publishedProjects) {
-		dependsOn publishedProject.path + ":check"
-	}
-}
-
-
 task jacocoRootReport(type: JacocoReport, group: 'Coverage reports') {
 	description = 'Generates an aggregate report from all subprojects'
 
-	dependsOn tasks.jacocoMerge
+	dependsOn publishedProjects.collect { it.tasks.withType(Test) }.flatten()
 
-	executionData tasks.jacocoMerge.destinationFile
+	executionData fileTree(rootProject.rootDir) {
+		include '*/build/jacoco/*.exec'
+		include '*/*/build/jacoco/*.exec'
+	}
+
+	doFirst {
+		executionData = files(executionData.findAll { it.exists() })
+	}
 
 	reports {
-		html.enabled = true // human readable
-		xml.enabled = true // required by coveralls
+		html.required = true
+		xml.required = true
 	}
 
 }
 
 
 coveralls {
-	jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
+	jacocoReportPath = layout.buildDirectory.file('reports/jacoco/jacocoRootReport/jacocoRootReport.xml').get().asFile.path
 }
 
 tasks.coveralls {
@@ -280,5 +267,3 @@ tasks.coveralls {
 
 	dependsOn jacocoRootReport
 }
-
-

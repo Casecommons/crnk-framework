@@ -1,7 +1,8 @@
 package io.crnk.data.jpa.internal;
 
+import org.junit.jupiter.api.Test;
+
 import io.crnk.test.mock.ClassTestUtils;
-import org.junit.Test;
 
 public class JpaRepositoryUtilsTest {
 

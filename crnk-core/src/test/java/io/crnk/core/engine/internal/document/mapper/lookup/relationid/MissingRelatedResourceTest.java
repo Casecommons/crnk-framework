@@ -5,14 +5,21 @@ import io.crnk.core.engine.internal.document.mapper.DocumentMapperTest;
 import io.crnk.core.exception.ResourceNotFoundException;
 import io.crnk.core.mock.models.RelationIdTestResource;
 import io.crnk.core.queryspec.QuerySpec;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MissingRelatedResourceTest extends DocumentMapperTest {
 
-	@Test(expected = ResourceNotFoundException.class)
+	@Test
 	public void provokeResourceNotFound() {
+	    assertThrows(ResourceNotFoundException.class, () -> {
+    		doProvokeResourceNotFound();
+	    });
+	}
+
+	protected void doProvokeResourceNotFound() {
 		RelationIdTestResource entity = new RelationIdTestResource();
 		entity.setId(0L);
 		entity.setTestResourceIdRefId(new ResourceIdentifier("1", "schedules"));

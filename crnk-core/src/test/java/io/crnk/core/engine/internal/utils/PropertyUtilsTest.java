@@ -1,9 +1,7 @@
 package io.crnk.core.engine.internal.utils;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
@@ -14,20 +12,19 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PropertyUtilsTest {
-
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
 
 	@Test
 	public void onNullBeanGetShouldThrowException() {
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(null, "privatePropertyWithMutators");
+    		// WHEN
+    		PropertyUtils.getProperty(null, "privatePropertyWithMutators");
+		});
 	}
 
 	@Test
@@ -49,10 +46,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(bean, (String) null);
+    		// WHEN
+    		PropertyUtils.getProperty(bean, (String) null);
+		});
 	}
 
 	@Test
@@ -150,10 +148,10 @@ public class PropertyUtilsTest {
 	public void getPropertyClassShouldThrowExceptionForInvalidField() {
 		try {
 			PropertyUtils.getPropertyClass(Bean.class, "doesNotExist");
-			Assert.fail();
+			Assertions.fail();
 		} catch (PropertyException e) {
-			Assert.assertEquals("doesNotExist", e.getField());
-			Assert.assertEquals(Bean.class, e.getResourceClass());
+			Assertions.assertEquals("doesNotExist", e.getField());
+			Assertions.assertEquals(Bean.class, e.getResourceClass());
 		}
 	}
 
@@ -161,10 +159,10 @@ public class PropertyUtilsTest {
 	public void getPropertyTypeShouldThrowExceptionForInvalidField() {
 		try {
 			PropertyUtils.getPropertyType(Bean.class, "doesNotExist");
-			Assert.fail();
+			Assertions.fail();
 		} catch (PropertyException e) {
-			Assert.assertEquals("doesNotExist", e.getField());
-			Assert.assertEquals(Bean.class, e.getResourceClass());
+			Assertions.assertEquals("doesNotExist", e.getField());
+			Assertions.assertEquals(Bean.class, e.getResourceClass());
 		}
 	}
 
@@ -193,10 +191,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(bean, "protectedProperty");
+    		// WHEN
+    		PropertyUtils.getProperty(bean, "protectedProperty");
+		});
 	}
 
 	@Test
@@ -240,10 +239,11 @@ public class PropertyUtilsTest {
 	@Test
 	public void onNullBeanSetShouldThrowException() {
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(null, "privatePropertyWithMutators", null);
+    		// WHEN
+    		PropertyUtils.setProperty(null, "privatePropertyWithMutators", null);
+		});
 	}
 
 	@Test
@@ -252,10 +252,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(IllegalArgumentException.class);
+		assertThrows(IllegalArgumentException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(bean, null, null);
+    		// WHEN
+    		PropertyUtils.setProperty(bean, null, null);
+		});
 	}
 
 	@Test
@@ -300,10 +301,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(bean, "protectedProperty", null);
+    		// WHEN
+    		PropertyUtils.setProperty(bean, "protectedProperty", null);
+		});
 	}
 
 	@Test
@@ -336,10 +338,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(bean, "nonExistingProperty");
+    		// WHEN
+    		PropertyUtils.getProperty(bean, "nonExistingProperty");
+		});
 	}
 
 	@Test
@@ -426,10 +429,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(IllegalStateException.class);
+		assertThrows(IllegalStateException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(bean, "uncheckedExceptionalField");
+    		// WHEN
+    		PropertyUtils.getProperty(bean, "uncheckedExceptionalField");
+		});
 	}
 
 	@Test
@@ -438,10 +442,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(IllegalStateException.class);
+		assertThrows(IllegalStateException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(bean, "uncheckedExceptionalField", "value");
+    		// WHEN
+    		PropertyUtils.setProperty(bean, "uncheckedExceptionalField", "value");
+		});
 	}
 
 	@Test
@@ -450,10 +455,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getProperty(bean, "PropertyException");
+    		// WHEN
+    		PropertyUtils.getProperty(bean, "PropertyException");
+		});
 	}
 
 	@Test
@@ -462,10 +468,11 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(bean, "checkedExceptionalField", "value");
+    		// WHEN
+    		PropertyUtils.setProperty(bean, "checkedExceptionalField", "value");
+		});
 	}
 
 	@Test
@@ -474,28 +481,31 @@ public class PropertyUtilsTest {
 		Bean bean = new Bean();
 
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.setProperty(bean, "attrThatDoesNotExist", "value");
+    		// WHEN
+    		PropertyUtils.setProperty(bean, "attrThatDoesNotExist", "value");
+		});
 	}
 
 	@Test
 	public void unknownPropertyClassThrowingException() {
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getPropertyClass(Bean.class, "attrThatDoesNotExist");
+    		// WHEN
+    		PropertyUtils.getPropertyClass(Bean.class, "attrThatDoesNotExist");
+		});
 	}
 
 	@Test
 	public void unknownPropertyTypeThrowingException() {
 		// THEN
-		expectedException.expect(PropertyException.class);
+		assertThrows(PropertyException.class, () -> {
 
-		// WHEN
-		PropertyUtils.getPropertyType(Bean.class, "attrThatDoesNotExist");
+    		// WHEN
+    		PropertyUtils.getPropertyType(Bean.class, "attrThatDoesNotExist");
+		});
 	}
 
 	@Test

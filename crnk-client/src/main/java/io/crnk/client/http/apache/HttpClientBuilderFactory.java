@@ -1,10 +1,7 @@
 package io.crnk.client.http.apache;
 
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 
-/**
- * Hopefully that can be removed soon again. But brave enforces its custom builder.
- */
 @Deprecated
 public interface HttpClientBuilderFactory {
 

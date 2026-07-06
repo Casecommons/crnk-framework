@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import javax.persistence.Entity;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.metamodel.ManagedType;
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.metamodel.ManagedType;
+import jakarta.ws.rs.ApplicationPath;
+import jakarta.ws.rs.core.Application;
 
 import io.crnk.client.CrnkClient;
 import io.crnk.client.action.JerseyActionStubFactory;
@@ -39,9 +39,9 @@ import io.crnk.test.mock.models.Task;
 import io.crnk.validation.ValidationModule;
 import okhttp3.OkHttpClient.Builder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public abstract class AbstractOperationsTest extends JerseyTestBase {
@@ -95,7 +95,7 @@ public abstract class AbstractOperationsTest extends JerseyTestBase {
 		}
 	}
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		clear();
 		client = new CrnkClient(getBaseUri().toString());
@@ -141,14 +141,14 @@ public abstract class AbstractOperationsTest extends JerseyTestBase {
 	}
 
 	@Override
-	@After
+	@AfterEach
 	public void tearDown() throws Exception {
 		super.tearDown();
 
 		clear();
 
 		if (context != null) {
-			context.destroy();
+			context.close();
 		}
 	}
 
@@ -171,7 +171,7 @@ public abstract class AbstractOperationsTest extends JerseyTestBase {
 
 
 		public TestApplication() {
-			Assert.assertNull(context);
+			Assertions.assertNull(context);
 
 			context = new AnnotationConfigApplicationContext(io.crnk.operations.OperationsTestConfig.class);
 			context.start();

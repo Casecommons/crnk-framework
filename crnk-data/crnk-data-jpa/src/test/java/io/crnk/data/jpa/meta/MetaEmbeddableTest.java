@@ -1,12 +1,15 @@
 package io.crnk.data.jpa.meta;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
+
+import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import io.crnk.data.jpa.model.TestEmbeddableBase;
 import io.crnk.data.jpa.model.TestEmbeddable;
 import io.crnk.meta.MetaLookupImpl;
 import io.crnk.meta.model.MetaElement;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Collections;
 
@@ -14,7 +17,7 @@ public class MetaEmbeddableTest {
 
 	private JpaMetaProvider metaProvider;
 
-	@Before
+	@BeforeEach
 	public void setup() {
 		metaProvider = new JpaMetaProvider(Collections.emptySet());
 		MetaLookupImpl lookup = new MetaLookupImpl();
@@ -24,13 +27,13 @@ public class MetaEmbeddableTest {
 	@Test
 	public void testMetaEmbeddableBaseDiscovery() {
 		MetaElement meta = metaProvider.discoverMeta(TestEmbeddableBase.class);
-		Assert.assertTrue(meta instanceof MetaEmbeddable);
+		Assertions.assertTrue(meta instanceof MetaEmbeddable);
 	}
 
 	@Test
 	public void testMetaEmbeddableDiscovery() {
 		MetaElement meta = metaProvider.discoverMeta(TestEmbeddable.class);
-		Assert.assertTrue(meta instanceof MetaEmbeddable);
+		Assertions.assertTrue(meta instanceof MetaEmbeddable);
 	}
 
 }
