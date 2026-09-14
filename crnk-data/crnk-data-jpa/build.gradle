@@ -1,5 +1,8 @@
 apply plugin: 'java'
 
+// Released independently of the root BUILD_VERSION; crnk-bom picks this up via it.version.
+version = '4.0.1'
+
 dependencies {
 	api project(':crnk-core')
 	api project(':crnk-meta')
