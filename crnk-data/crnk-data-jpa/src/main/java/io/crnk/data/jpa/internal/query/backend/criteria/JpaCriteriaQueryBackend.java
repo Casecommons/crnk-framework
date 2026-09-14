@@ -259,7 +259,7 @@ public class JpaCriteriaQueryBackend<T> implements JpaQueryBackend<From<?, ?>, O
 	private Expression<?> handleConversions(Expression<?> expression, FilterOperator operator) {
 		// convert to String for LIKE operators
 		if (expression.getJavaType() != String.class && (operator == FilterOperator.LIKE)) {
-			return expression.as(String.class);
+			return expression.cast(String.class);
 		} else {
 			return expression;
 		}
