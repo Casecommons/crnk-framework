@@ -163,6 +163,16 @@ public class DefaultQuerySpecUrlMapper
 	public QuerySpec deserialize(ResourceInformation resourceInformation, Map<String, Set<String>> parameterMap, QueryContext queryContext) {
 		QuerySpec rootQuerySpec = createQuerySpec(resourceInformation);
 
+		RegistryEntry entry = context.getResourceRegistry().getEntry(resourceInformation.getResourceType());
+		PagingBehavior<PagingSpec> pagingBehavior = entry.getPagingBehavior();
+
+		// Related query specs created while parsing copy the root's paging, so give the root an empty paging spec of
+		// its own behavior first. Otherwise they keep the default which is OffsetLimitPagingSpec, which a different behavior
+		// such as NumberSizePagingBehavior fails when cast.
+		if (pagingBehavior != null) {
+			rootQuerySpec.setPaging(pagingBehavior.createEmptyPagingSpec());
+		}
+
 		List<QueryParameter> parameters = parseParameters(parameterMap, resourceInformation);
 		Map<String, Set<String>> pageParameters = new HashMap<>();
 		for (QueryParameter parameter : parameters) {
@@ -196,9 +206,6 @@ public class DefaultQuerySpecUrlMapper
 					deserializeUnknown(querySpec, parameter);
 			}
 		}
-
-		RegistryEntry entry = context.getResourceRegistry().getEntry(resourceInformation.getResourceType());
-		PagingBehavior<PagingSpec> pagingBehavior = entry.getPagingBehavior();
 
 		if (pagingBehavior == null && !pageParameters.isEmpty()) {
 			throw new IllegalStateException("Instance of PagingBehavior must be provided");
